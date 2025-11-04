@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                  Int        @id @default(autoincrement())
+  name                String     @db.VarChar(120)
+  email               String     @unique @db.VarChar(191)
+  phone               String?    @db.VarChar(32)
+  password_hash       String     @db.VarChar(191)
+  role                Role       @default(USER)
+  default_address_id  Int?       @unique
+  addresses           Address[]  @relation("UserAddresses")
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+}
+
+model Address {
+  id             Int       @id @default(autoincrement())
+  user_id        Int
+  label          String?   @db.VarChar(60)
+  recipient_name String    @db.VarChar(120)
+  phone          String?   @db.VarChar(32)
+  street         String    @db.VarChar(255)
+  city           String    @db.VarChar(120)
+  province       String    @db.VarChar(120)
+  postal_code    String    @db.VarChar(16)
+  is_default     Boolean   @default(false)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  user User @relation("UserAddresses", fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
