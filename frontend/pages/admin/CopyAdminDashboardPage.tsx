@@ -87,7 +87,7 @@ const AdminDashboardPage: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow">
                 <h3 className="text-xl font-semibold text-gray-700 mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Link to="/admin/products" className="block p-4 text-center text-white rounded-lg hover:bg-gray-800 transition">Manage Products</Link>
+                    <Link to="/admin/products" className="block p-4 text-center bg-black text-white rounded-lg hover:bg-gray-800 transition">Manage Products</Link>
                     <Link to="/admin/orders" className="block p-4 text-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Manage Orders</Link>
                 </div>
             </div>

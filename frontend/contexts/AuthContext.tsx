@@ -4,6 +4,7 @@ import { User, UserRole } from '../types';
 import * as authService from '../services/authService'; 
 import { useNavigate } from 'react-router-dom';
 
+const DEV_AUTH = true; 
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -23,13 +24,29 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(()=> {
+    const savedUser = localStorage.getItem('userData');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [token, setToken] = useState<string | null>(localStorage.getItem('authToken'));
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(!localStorage.getItem('authToken'));
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const checkAuth = useCallback(async () => {
+    if (DEV_AUTH) {
+      const mockUser: User = {
+        id :1,
+        name :'dev',
+        email : 'dev@gmail.com',
+        role : UserRole.ADMIN,
+      };
+      setUser(mockUser);
+      setToken('dev-token');
+      setIsLoading(false);
+      return;
+    }
+
     const storedToken = localStorage.getItem('authToken');
     if (storedToken) {
       setToken(storedToken);
@@ -101,6 +118,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
     navigate('/');
   };
 

@@ -8,17 +8,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
-  id                  Int        @id @default(autoincrement())
-  name                String     @db.VarChar(120)
-  email               String     @unique @db.VarChar(191)
-  phone               String?    @db.VarChar(32)
-  password_hash       String     @db.VarChar(191)
-  role                Role       @default(USER)
-  default_address_id  Int?       @unique
-  addresses           Address[]  @relation("UserAddresses")
-  created_at          DateTime   @default(now())
-  updated_at          DateTime   @updatedAt
+  id                 Int        @id @default(autoincrement())
+  name               String     @db.VarChar(120)
+  email              String     @unique @db.VarChar(191)
+  phone              String?    @db.VarChar(32)
+  password_hash      String     @db.VarChar(191)
+  role               Role       @default(USER)
+  default_address_id Int?       @unique
+  addresses          Address[]  @relation("UserAddresses")
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @updatedAt
 }
 
 model Address {
@@ -38,7 +43,34 @@ model Address {
   user User @relation("UserAddresses", fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-enum Role {
-  USER
-  ADMIN
+model Brand {
+  id      BigInt  @id @default(autoincrement())
+  name    String  @unique
+  Product Product[]
+}
+
+model Product {
+  id          BigInt   @id @default(autoincrement())
+  brand_id    BigInt
+  name        String
+  description String?
+  price       Decimal   @db.Decimal(12,2)
+  image_url   String?
+  is_active   Boolean   @default(true)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  brand   Brand          @relation(fields: [brand_id], references: [id])
+  images  ProductImage[]
+}
+
+model ProductImage {
+  id           BigInt   @id @default(autoincrement())
+  product_id   BigInt
+  image_url    String
+  is_thumbnail Boolean  @default(false)
+  created_at   DateTime @default(now())
+
+  product Product @relation(fields: [product_id], references: [id])
+  @@index([product_id])
 }

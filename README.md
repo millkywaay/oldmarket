@@ -13,7 +13,6 @@ oldmarket/
 ├── backend/      # Next.js API + Prisma + 
 ├── .gitignore
 ├── README.md
-└── ...
 
 ````
 

@@ -18,8 +18,8 @@ const InitialChoicePage: React.FC = () => {
     >
       <div className="absolute inset-0 bg-black/50"></div>
       <div className="relative bg-white/90 backdrop-blur-sm p-8 sm:p-12 rounded-xl shadow-2xl text-center max-w-md w-full">
-        <h1 className="text-5xl font-extrabold text-black mb-4">{LOGO_TEXT}</h1>
-        <p className="text-neutral-700 text-lg mb-10">Welcome to <span className='font-bold'>OLDMARKET</span>for jacket enthusiasts.</p>
+        <h1 className="text-4xl font-extrabold text-black mb-4">{LOGO_TEXT}</h1>
+        <p className="text-neutral-700 text-lg mb-10">Welcome to <span className='font-bold'>OLDMARKET </span>for jacket enthusiasts.</p>
         
         <div className="space-y-4">
           <Button 

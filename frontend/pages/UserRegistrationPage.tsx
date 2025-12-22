@@ -35,13 +35,18 @@ const UserRegistrationPage: React.FC = () => {
   return (
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className="mt-6 text-center text-5xl font-extrabold text-black">{LOGO_TEXT}</h2>
-          <p className="mt-2 text-center text-md text-gray-600">
-            Create your customer account
+
+        <div className="bg-white p-8 rounded-xl shadow-lg border">
+                  <div className="text-center">
+           <img
+              src="/images/logo.svg"
+              alt="oldmarket"
+              className="mx-auto h-24 w-auto"
+            />
+          <p className="mt-2 mb-5 text-center text-3xl text-black font-bold">
+            Get Started
           </p>
         </div>
-        <div className="bg-white p-8 rounded-xl shadow-lg border">
             <form className="space-y-6" onSubmit={handleSubmit}>
               {(authError || formError) && <p className="text-sm text-red-600 bg-red-100 p-3 rounded-md text-center">{authError || formError}</p>}
               <FormField
