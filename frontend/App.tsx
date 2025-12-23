@@ -17,11 +17,14 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminProductManagementPage from "./pages/admin/AdminProductManagementPage";
 import AdminOrderManagementPage from "./pages/admin/AdminOrderManagementPage";
 import AdminSalesReportsPage from "./pages/admin/AdminSalesReportsPage";
-
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { UserRole } from "./types";
 import AdminLayout from "./components/layout/AdminLayout";
 import CustomerLayout from "./components/layout/CustomerLayout";
+
+import AddProductPage from "./pages/admin/AddProductPage";
+import EditProductPage from "./pages/admin/EditProductPage";
+
 
 const App: React.FC = () => {
   return (
@@ -59,18 +62,11 @@ const App: React.FC = () => {
           <Route element={<ProtectedRoute roles={[UserRole.ADMIN]} />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-              <Route
-                path="/admin/products"
-                element={<AdminProductManagementPage />}
-              />
-              <Route
-                path="/admin/orders"
-                element={<AdminOrderManagementPage />}
-              />
-              <Route
-                path="/admin/reports"
-                element={<AdminSalesReportsPage />}
-              />
+              <Route path="/admin/products" element={<AdminProductManagementPage />} />
+              <Route path="/admin/products/new" element={<AddProductPage />} />
+              <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
+              <Route path="/admin/orders" element={<AdminOrderManagementPage />} />
+              <Route path="/admin/reports" element={<AdminSalesReportsPage />} />
             </Route>
           </Route>
 

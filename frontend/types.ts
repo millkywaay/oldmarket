@@ -24,17 +24,17 @@ export interface Product {
   stock_quantity: number;
   image_url: string;
   brand_id: string;
-  brand?: Brand; // Optional: populated if joining
+  brand?: Brand; 
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CartItem {
-  id: string; // This could be product_id if items are unique by product in cart
+  id: string;
   product_id: string;
   quantity: number;
-  product?: Product; // Populated for display
-  price_at_addition?: number; // Could be useful
+  product?: Product;
+  price_at_addition?: number;
 }
 
 export interface Cart {
