@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from "@/lib/prismas";
+
+import { prisma } from "@/lib/prisma";
 import { serializeProduct, serializeData } from "@/lib/serialize";
 import { NextResponse } from "next/server";
 
@@ -18,13 +19,14 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, description, price, stock_quantity, brand_id, images } = body;
+    const { name, description, price, stock_quantity, brand_id, images, size } = body;
 
     const product = await prisma.product.create({
       data: {
         name,
         description,
         price: Number(price),
+        size,
         stock_quantity: Number(stock_quantity) || 0,
         brand: {
           connect: { id: Number(brand_id) } 

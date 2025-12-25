@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { prisma } from "@/lib/prismas";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { serializeProduct } from "@/lib/serialize";
 import { supabase } from "@/services/supabaseClient";
@@ -11,7 +11,7 @@ type RouteContext = {
 
 export async function GET(req: Request, context: RouteContext) {
   const { id } = await context.params;
-  const productId = BigInt(id);
+  const productId = Number(id);
 
   const product = await prisma.product.findUnique({
     where: { id: productId },
@@ -27,7 +27,7 @@ export async function GET(req: Request, context: RouteContext) {
 
 export async function PUT(req: Request, context: RouteContext) {
   const { id } = await context.params;
-  const productId = BigInt(id);
+  const productId = Number(id);
   const body = await req.json();
 
   if (!body || !body.name) {
@@ -43,8 +43,9 @@ export async function PUT(req: Request, context: RouteContext) {
       name: body.name,
       description: body.description ?? null,
       price: body.price,
+      size: body.size,
       stock_quantity: Number(body.stock_quantity) || 0,
-      brand_id: BigInt(body.brand_id),
+      brand_id: Number(body.brand_id),
       images: {
         create:
           (body.images as any[] | undefined)?.map((img) => ({
@@ -64,7 +65,7 @@ export async function PUT(req: Request, context: RouteContext) {
 
 export async function DELETE(req: Request, context: RouteContext) {
   const { id } = await context.params;
-  const productId = BigInt(id);
+  const productId = Number(id);
 
   const productImages = await prisma.productImage.findMany({
     where: { product_id: productId },

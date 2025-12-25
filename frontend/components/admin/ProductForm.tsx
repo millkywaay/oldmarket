@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Brand } from "../../types"; // Hapus 'Product' jika tidak digunakan langsung di sini
+import { Brand, Size } from "../../types";
 import Button from "../common/Button";
 import FormField from "../common/FormField";
 import ProductImageUploader from "./ProductImageUploader";
@@ -18,17 +18,22 @@ export default function ProductForm({
   isSubmitting,
 }: ProductFormProps) {
   const [images, setImages] = useState<any[]>(
-    initialData?.image_url
+    initialData?.images && initialData.images.length > 0
+      ? initialData.images.map((img: any) => ({
+          url: img.image_url,
+          isCover: img.is_thumbnail,
+        }))
+      : initialData?.image_url
       ? [{ url: initialData.image_url, isCover: true }]
       : []
   );
-
   const [form, setForm] = useState({
     name: initialData?.name || "",
     description: initialData?.description || "",
     price: initialData?.price || 0,
     stock_quantity: initialData?.stock_quantity || 0,
     brand_id: initialData?.brand_id || (brands.length > 0 ? brands[0].id : ""),
+    size: initialData?.size || "",
   });
 
   const handleChange = (
@@ -83,7 +88,7 @@ export default function ProductForm({
           ))}
         </FormField>
       </div>
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Product Images
@@ -101,7 +106,7 @@ export default function ProductForm({
         required
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FormField
           label="Price (IDR)"
           name="price"
@@ -110,6 +115,21 @@ export default function ProductForm({
           onChange={handleChange}
           required
         />
+        <FormField
+          as="select"
+          label="Size (Ukuran)"
+          name="size"
+          value={form.size}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Size</option>
+          {Object.values(Size).map((s) => (
+            <option key={s as string} value={s as string}>
+              {s as string}
+            </option>
+          ))}
+        </FormField>
         <FormField
           label="Stock"
           name="stock_quantity"
@@ -121,7 +141,12 @@ export default function ProductForm({
       </div>
 
       <div className="flex justify-end gap-3 pt-6 border-t">
-        <Button type="button" variant="outline" onClick={() => window.history.back()} disabled={isSubmitting}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => window.history.back()}
+          disabled={isSubmitting}
+        >
           Batal
         </Button>
         <Button type="submit" variant="primary" isLoading={isSubmitting}>

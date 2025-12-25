@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import FormField from '../components/common/FormField';
 import Button from '../components/common/Button';
-import { LOGO_TEXT } from '../constants';
 
 const UserRegistrationPage: React.FC = () => {
   const [username, setUsername] = useState('');

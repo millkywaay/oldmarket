@@ -25,10 +25,19 @@ const AdminProductManagementPage: React.FC = () => {
         productService.getAllProducts(),
         productService.getBrands(),
       ]);
+
       setProducts(Array.isArray(productsData) ? productsData : []);
-      const brandsList =
-        brandsResponse.brands ||
-        (Array.isArray(brandsResponse) ? brandsResponse : []);
+      let brandsList: Brand[] = [];
+      if (Array.isArray(brandsResponse)) {
+        brandsList = brandsResponse;
+      } else if (
+        brandsResponse &&
+        typeof brandsResponse === "object" &&
+        "brands" in brandsResponse
+      ) {
+        brandsList = (brandsResponse as any).brands;
+      }
+
       setBrands(brandsList);
     } catch (err: any) {
       setError(err.message || "Gagal memuat data.");
@@ -36,7 +45,6 @@ const AdminProductManagementPage: React.FC = () => {
       setIsLoading(false);
     }
   }, []);
-
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -87,6 +95,10 @@ const AdminProductManagementPage: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Harga
                 </th>
+                {/* Kolom Size Baru */}
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Size
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Stok
                 </th>
@@ -129,6 +141,12 @@ const AdminProductManagementPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                       {DEFAULT_CURRENCY} {p.price.toLocaleString("id-ID")}
+                    </td>
+                    {/* Data Size Baru */}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      <span className="px-2 py-1 bg-gray-100 rounded text-xs font-mono uppercase">
+                        {p.size || "-"}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span

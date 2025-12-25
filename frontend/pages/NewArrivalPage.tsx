@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Product } from '../types';
 import * as productService from '../services/productService';
@@ -8,19 +7,19 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 const NewArrivalPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
-      setError(null);
       try {
-        const { items } = await productService.getAllProducts();
-        // Mock logic: Newest are those with higher letter IDs or numbers
-        const sortedById = [...items].sort((a, b) => b.id.localeCompare(a.id));
-        setProducts(sortedById.slice(0, 12)); // Show more new arrivals
+        const data = await productService.getAllProducts();
+        // Urutkan berdasarkan tanggal dibuat (created_at) dari database
+        const sorted = [...data].sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setProducts(sorted.slice(0, 12));
       } catch (err: any) {
-        setError(err.message || 'Failed to load products.');
+        console.error(err.message || 'Gagal memuat produk terbaru.');
       } finally {
         setIsLoading(false);
       }
@@ -29,29 +28,13 @@ const NewArrivalPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="pb-16">
-      <header className="bg-gray-100 py-10">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-extrabold text-black">New Arrivals</h1>
-          <p className="text-gray-600 mt-2 max-w-2xl mx-auto">Check out the latest additions to our collection. Freshly dropped for the new season.</p>
+    <div className="container mx-auto px-4 pt-12 pb-16">
+      <h1 className="text-4xl font-extrabold text-center mb-10 uppercase tracking-tighter">New Arrivals</h1>
+      {isLoading ? <LoadingSpinner /> : (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {products.map(product => <ProductCard key={product.id} product={product} />)}
         </div>
-      </header>
-      
-      <main className="container mx-auto px-4 pt-12">
-        {isLoading ? (
-          <LoadingSpinner message="Loading new arrivals..." />
-        ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
-        ) : products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-600 py-10">No new arrivals at the moment. Please check back later.</p>
-        )}
-      </main>
+      )}
     </div>
   );
 };

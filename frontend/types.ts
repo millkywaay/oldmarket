@@ -13,20 +13,45 @@ export interface User {
 export interface Brand {
   id: string;
   name: string;
-  description?: string;
+}
+
+export enum Size {
+  XS = 'XS',
+  S = 'S',
+  M = 'M',
+  L = 'L',
+  XL = 'XL',
+  XXL = 'XXL'
+}
+
+export interface ProductImage {
+  id: number;
+  product_id: number;
+  image_url: string;
+  is_thumbnail: boolean;
+  created_at: string;
 }
 
 export interface Product {
-  id: string;
+  id: string; 
+  brand_id: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
   stock_quantity: number;
-  image_url: string;
-  brand_id: string;
-  brand?: Brand; 
-  created_at?: string;
-  updated_at?: string;
+  image_url?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  
+
+  size?: Size | string; 
+  images?: ProductImage[]; 
+
+  brand?: {
+    id: string | number;
+    name: string;
+  };
 }
 
 export interface CartItem {
@@ -58,7 +83,7 @@ export interface OrderItem {
   product_id: string;
   quantity: number;
   price_at_purchase: number;
-  product?: Product; // Populated for display
+  product?: Product; 
 }
 
 export interface Order {
@@ -66,8 +91,8 @@ export interface Order {
   user_id: string;
   total_amount: number;
   order_status: OrderStatus;
-  shipping_address: string; // Simplified for now
-  payment_method: string; // e.g., "Internal Courier" "Manual Bank Transfer"
+  shipping_address: string; 
+  payment_method: string; 
   transaction_currency: 'IDR';
   created_at: string;
   updated_at?: string;
@@ -75,7 +100,7 @@ export interface Order {
 }
 
 export interface SalesDataPoint {
-  date: string; // or any other grouping like month, product
+  date: string; 
   revenue: number;
   orders: number;
 }
@@ -94,7 +119,7 @@ export interface AdminDashboardSummary {
   bestSellingProducts: BestSellingProduct[];
 }
 
-// For API responses that might include pagination
+
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;

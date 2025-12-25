@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prismas";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { serializeData } from "@/lib/serialize";
 
