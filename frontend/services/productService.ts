@@ -1,13 +1,20 @@
-const BASE = "http://localhost:3000/api/products";
+const BASE = "http://localhost:3000/api";
 
 export async function getAllProducts() {
-  const res = await fetch(BASE);
+  const res = await fetch(`${BASE}/products`);
   if (!res.ok) throw new Error("Gagal mengambil produk");
   const data = await res.json();
-  return Array.isArray(data) ? data : []; 
+  return Array.isArray(data) ? data : data.products || []; 
+}
+
+export async function getProductById(proudctId: String){
+  const res = await fetch(`${BASE}/products/${proudctId}`)
+  if (!res.ok) throw new Error("Produk tidak ditemukan");
+  return await res.json()
 }
 export async function getBrands() {
-  const res = await fetch("http://localhost:3000/api/brands");
+  const res = await fetch(`${BASE}/brands`);
+  if (!res.ok) throw new Error("Gagal mengambil brand");
   const data = await res.json();
   return data.brands || data; 
 }

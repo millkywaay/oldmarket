@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         price: Number(price),
         stock_quantity: Number(stock_quantity) || 0,
         brand: {
-          connect: { id: BigInt(brand_id) } 
+          connect: { id: Number(brand_id) } 
         },
         image_url: images.find((i: any) => i.is_thumbnail)?.image_url || images[0]?.image_url,
         images: {

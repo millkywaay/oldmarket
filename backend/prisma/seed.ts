@@ -11,7 +11,7 @@ async function main() {
     where: { email: 'admin@gmail.com' },
     update: {},
     create: {
-      name: 'Admin',
+      name: 'admin',
       email: 'admin@gmail.com',
       phone: '081234567890',
       password_hash: adminPassword,
