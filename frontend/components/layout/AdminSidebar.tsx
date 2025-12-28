@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Tambahkan useNavigate
+import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
 import {
   LayoutDashboard,
   Package,
@@ -20,6 +21,8 @@ const AdminSidebar: React.FC<SidebarProps> = ({
   setIsCollapsed,
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth(); // Ambil fungsi logout dari context
 
   const menuItems = [
     { path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
@@ -27,6 +30,14 @@ const AdminSidebar: React.FC<SidebarProps> = ({
     { path: "/admin/orders", icon: <ShoppingCart size={20} />, label: "Orders" },
     { path: "/admin/reports", icon: <BarChart3 size={20} />, label: "Reports" },
   ];
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.confirm("Apakah Anda yakin ingin logout?")) {
+      logout();
+      navigate("/");
+    }
+  };
 
   return (
     <aside
@@ -75,13 +86,13 @@ const AdminSidebar: React.FC<SidebarProps> = ({
 
       {/* Logout */}
       <div className="p-2">
-        <Link
-          to="/home"
-          className="flex items-center gap-3 p-3 rounded-lg text-red-600 hover:bg-red-100 transition"
+        <button
+          onClick={handleLogout} 
+          className="w-full flex items-center gap-3 p-3 rounded-lg text-red-600 hover:bg-red-100 transition border-none cursor-pointer text-left"
         >
           <LogOut size={20} />
           {!isCollapsed && <span>Logout</span>}
-        </Link>
+        </button>
       </div>
     </aside>
   );

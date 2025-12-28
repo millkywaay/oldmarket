@@ -8,6 +8,21 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  phone?: string;
+  addresses?: Address[];
+  default_address_id?: number | null;
+}
+
+export interface Address {
+  id: number;
+  label: string;
+  recipient_name: string;
+  phone: string;
+  street: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  is_default: boolean;
 }
 
 export interface Brand {

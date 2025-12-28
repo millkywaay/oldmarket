@@ -59,9 +59,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, [token, user]);
 
-  useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+  // useEffect(() => {
+  //   fetchCart();
+  // }, [fetchCart]);
 
   const addToCart = async (product: Product, quantity: number) => {
     if (!token) {

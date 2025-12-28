@@ -11,7 +11,7 @@ const UserLoginPage: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const DEV_AUTH = true;
+  const DEV_AUTH = false;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
