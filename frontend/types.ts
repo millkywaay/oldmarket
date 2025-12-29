@@ -15,12 +15,23 @@ export interface User {
 
 export interface Address {
   id: number;
-  label: string;
+  label?: string;
   recipient_name: string;
-  phone: string;
+  phone?: string;
   street: string;
-  city: string;
+
   province: string;
+  province_code: string;
+
+  city: string;
+  city_code: string;
+
+  district?: string;
+  district_code?: string;
+
+  village?: string;
+  village_code?: string;
+
   postal_code: string;
   is_default: boolean;
 }

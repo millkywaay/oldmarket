@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { label, recipient_name, phone, street, city, province, postal_code, is_default } = body;
+    const { label, recipient_name, phone, street, province, province_code,city, city_code, district, district_code, village, village_code, postal_code, is_default } = body;
 
     if (is_default) {
       await prisma.address.updateMany({
@@ -41,8 +41,10 @@ export async function POST(req: Request) {
         recipient_name,
         phone,
         street,
-        city,
-        province,
+        province, province_code,
+        city, city_code,
+        district, district_code,
+        village, village_code,
         postal_code,
         is_default: is_default || false
       }
@@ -57,7 +59,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newAddress, { status: 201 });
   } catch (error) {
-    console.error("API Address Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -68,6 +69,8 @@ export async function PATCH(req: Request) {
 
     const body = await req.json();
     const { id, is_default, ...updateData } = body;
+    const addressId = Number(id);
+    
     if (is_default) {
       await prisma.address.updateMany({
         where: { user_id: decoded.id },
@@ -82,5 +85,23 @@ export async function PATCH(req: Request) {
     return NextResponse.json(updated);
   } catch (error) {
     return NextResponse.json({ error: "Gagal update alamat" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const decoded = verifyToken(req);
+    if (!decoded) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if(!id) return NextResponse.json({ error: "ID alamat diperlukan" }, { status: 400 });
+
+    await prisma.address.delete({
+      where: { id: Number(id), user_id: decoded.id }
+    });
+    return NextResponse.json({ message: "Alamat dihapus" })
+  } catch (error) {
+    return NextResponse.json({ error: "Gagal menghapus alamat" }, { status: 500 });
   }
 }

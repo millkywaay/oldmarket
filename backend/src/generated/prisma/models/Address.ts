@@ -43,8 +43,14 @@ export type AddressMinAggregateOutputType = {
   recipient_name: string | null
   phone: string | null
   street: string | null
-  city: string | null
   province: string | null
+  province_code: string | null
+  city: string | null
+  city_code: string | null
+  district: string | null
+  district_code: string | null
+  village: string | null
+  village_code: string | null
   postal_code: string | null
   is_default: boolean | null
   created_at: Date | null
@@ -58,8 +64,14 @@ export type AddressMaxAggregateOutputType = {
   recipient_name: string | null
   phone: string | null
   street: string | null
-  city: string | null
   province: string | null
+  province_code: string | null
+  city: string | null
+  city_code: string | null
+  district: string | null
+  district_code: string | null
+  village: string | null
+  village_code: string | null
   postal_code: string | null
   is_default: boolean | null
   created_at: Date | null
@@ -73,8 +85,14 @@ export type AddressCountAggregateOutputType = {
   recipient_name: number
   phone: number
   street: number
-  city: number
   province: number
+  province_code: number
+  city: number
+  city_code: number
+  district: number
+  district_code: number
+  village: number
+  village_code: number
   postal_code: number
   is_default: number
   created_at: number
@@ -100,8 +118,14 @@ export type AddressMinAggregateInputType = {
   recipient_name?: true
   phone?: true
   street?: true
-  city?: true
   province?: true
+  province_code?: true
+  city?: true
+  city_code?: true
+  district?: true
+  district_code?: true
+  village?: true
+  village_code?: true
   postal_code?: true
   is_default?: true
   created_at?: true
@@ -115,8 +139,14 @@ export type AddressMaxAggregateInputType = {
   recipient_name?: true
   phone?: true
   street?: true
-  city?: true
   province?: true
+  province_code?: true
+  city?: true
+  city_code?: true
+  district?: true
+  district_code?: true
+  village?: true
+  village_code?: true
   postal_code?: true
   is_default?: true
   created_at?: true
@@ -130,8 +160,14 @@ export type AddressCountAggregateInputType = {
   recipient_name?: true
   phone?: true
   street?: true
-  city?: true
   province?: true
+  province_code?: true
+  city?: true
+  city_code?: true
+  district?: true
+  district_code?: true
+  village?: true
+  village_code?: true
   postal_code?: true
   is_default?: true
   created_at?: true
@@ -228,12 +264,18 @@ export type AddressGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type AddressGroupByOutputType = {
   id: number
   user_id: number
-  label: string | null
+  label: string
   recipient_name: string
-  phone: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default: boolean
   created_at: Date
@@ -266,12 +308,18 @@ export type AddressWhereInput = {
   NOT?: Prisma.AddressWhereInput | Prisma.AddressWhereInput[]
   id?: Prisma.IntFilter<"Address"> | number
   user_id?: Prisma.IntFilter<"Address"> | number
-  label?: Prisma.StringNullableFilter<"Address"> | string | null
+  label?: Prisma.StringFilter<"Address"> | string
   recipient_name?: Prisma.StringFilter<"Address"> | string
-  phone?: Prisma.StringNullableFilter<"Address"> | string | null
+  phone?: Prisma.StringFilter<"Address"> | string
   street?: Prisma.StringFilter<"Address"> | string
-  city?: Prisma.StringFilter<"Address"> | string
   province?: Prisma.StringFilter<"Address"> | string
+  province_code?: Prisma.StringFilter<"Address"> | string
+  city?: Prisma.StringFilter<"Address"> | string
+  city_code?: Prisma.StringFilter<"Address"> | string
+  district?: Prisma.StringFilter<"Address"> | string
+  district_code?: Prisma.StringFilter<"Address"> | string
+  village?: Prisma.StringFilter<"Address"> | string
+  village_code?: Prisma.StringFilter<"Address"> | string
   postal_code?: Prisma.StringFilter<"Address"> | string
   is_default?: Prisma.BoolFilter<"Address"> | boolean
   created_at?: Prisma.DateTimeFilter<"Address"> | Date | string
@@ -283,12 +331,18 @@ export type AddressWhereInput = {
 export type AddressOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
-  label?: Prisma.SortOrderInput | Prisma.SortOrder
+  label?: Prisma.SortOrder
   recipient_name?: Prisma.SortOrder
-  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  phone?: Prisma.SortOrder
   street?: Prisma.SortOrder
-  city?: Prisma.SortOrder
   province?: Prisma.SortOrder
+  province_code?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  city_code?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  district_code?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  village_code?: Prisma.SortOrder
   postal_code?: Prisma.SortOrder
   is_default?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -303,12 +357,18 @@ export type AddressWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AddressWhereInput[]
   NOT?: Prisma.AddressWhereInput | Prisma.AddressWhereInput[]
   user_id?: Prisma.IntFilter<"Address"> | number
-  label?: Prisma.StringNullableFilter<"Address"> | string | null
+  label?: Prisma.StringFilter<"Address"> | string
   recipient_name?: Prisma.StringFilter<"Address"> | string
-  phone?: Prisma.StringNullableFilter<"Address"> | string | null
+  phone?: Prisma.StringFilter<"Address"> | string
   street?: Prisma.StringFilter<"Address"> | string
-  city?: Prisma.StringFilter<"Address"> | string
   province?: Prisma.StringFilter<"Address"> | string
+  province_code?: Prisma.StringFilter<"Address"> | string
+  city?: Prisma.StringFilter<"Address"> | string
+  city_code?: Prisma.StringFilter<"Address"> | string
+  district?: Prisma.StringFilter<"Address"> | string
+  district_code?: Prisma.StringFilter<"Address"> | string
+  village?: Prisma.StringFilter<"Address"> | string
+  village_code?: Prisma.StringFilter<"Address"> | string
   postal_code?: Prisma.StringFilter<"Address"> | string
   is_default?: Prisma.BoolFilter<"Address"> | boolean
   created_at?: Prisma.DateTimeFilter<"Address"> | Date | string
@@ -320,12 +380,18 @@ export type AddressWhereUniqueInput = Prisma.AtLeast<{
 export type AddressOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
-  label?: Prisma.SortOrderInput | Prisma.SortOrder
+  label?: Prisma.SortOrder
   recipient_name?: Prisma.SortOrder
-  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  phone?: Prisma.SortOrder
   street?: Prisma.SortOrder
-  city?: Prisma.SortOrder
   province?: Prisma.SortOrder
+  province_code?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  city_code?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  district_code?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  village_code?: Prisma.SortOrder
   postal_code?: Prisma.SortOrder
   is_default?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -343,12 +409,18 @@ export type AddressScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AddressScalarWhereWithAggregatesInput | Prisma.AddressScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Address"> | number
   user_id?: Prisma.IntWithAggregatesFilter<"Address"> | number
-  label?: Prisma.StringNullableWithAggregatesFilter<"Address"> | string | null
+  label?: Prisma.StringWithAggregatesFilter<"Address"> | string
   recipient_name?: Prisma.StringWithAggregatesFilter<"Address"> | string
-  phone?: Prisma.StringNullableWithAggregatesFilter<"Address"> | string | null
+  phone?: Prisma.StringWithAggregatesFilter<"Address"> | string
   street?: Prisma.StringWithAggregatesFilter<"Address"> | string
-  city?: Prisma.StringWithAggregatesFilter<"Address"> | string
   province?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  province_code?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  city?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  city_code?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  district?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  district_code?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  village?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  village_code?: Prisma.StringWithAggregatesFilter<"Address"> | string
   postal_code?: Prisma.StringWithAggregatesFilter<"Address"> | string
   is_default?: Prisma.BoolWithAggregatesFilter<"Address"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Address"> | Date | string
@@ -356,12 +428,18 @@ export type AddressScalarWhereWithAggregatesInput = {
 }
 
 export type AddressCreateInput = {
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -373,12 +451,18 @@ export type AddressCreateInput = {
 export type AddressUncheckedCreateInput = {
   id?: number
   user_id: number
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -387,12 +471,18 @@ export type AddressUncheckedCreateInput = {
 }
 
 export type AddressUpdateInput = {
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -404,12 +494,18 @@ export type AddressUpdateInput = {
 export type AddressUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   user_id?: Prisma.IntFieldUpdateOperationsInput | number
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -420,12 +516,18 @@ export type AddressUncheckedUpdateInput = {
 export type AddressCreateManyInput = {
   id?: number
   user_id: number
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -433,12 +535,18 @@ export type AddressCreateManyInput = {
 }
 
 export type AddressUpdateManyMutationInput = {
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -448,12 +556,18 @@ export type AddressUpdateManyMutationInput = {
 export type AddressUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   user_id?: Prisma.IntFieldUpdateOperationsInput | number
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -477,8 +591,14 @@ export type AddressCountOrderByAggregateInput = {
   recipient_name?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   street?: Prisma.SortOrder
-  city?: Prisma.SortOrder
   province?: Prisma.SortOrder
+  province_code?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  city_code?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  district_code?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  village_code?: Prisma.SortOrder
   postal_code?: Prisma.SortOrder
   is_default?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -497,8 +617,14 @@ export type AddressMaxOrderByAggregateInput = {
   recipient_name?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   street?: Prisma.SortOrder
-  city?: Prisma.SortOrder
   province?: Prisma.SortOrder
+  province_code?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  city_code?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  district_code?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  village_code?: Prisma.SortOrder
   postal_code?: Prisma.SortOrder
   is_default?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -512,8 +638,14 @@ export type AddressMinOrderByAggregateInput = {
   recipient_name?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   street?: Prisma.SortOrder
-  city?: Prisma.SortOrder
   province?: Prisma.SortOrder
+  province_code?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  city_code?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  district_code?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  village_code?: Prisma.SortOrder
   postal_code?: Prisma.SortOrder
   is_default?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -593,12 +725,18 @@ export type AddressUpdateOneWithoutOrdersNestedInput = {
 }
 
 export type AddressCreateWithoutUserInput = {
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -608,12 +746,18 @@ export type AddressCreateWithoutUserInput = {
 
 export type AddressUncheckedCreateWithoutUserInput = {
   id?: number
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -653,12 +797,18 @@ export type AddressScalarWhereInput = {
   NOT?: Prisma.AddressScalarWhereInput | Prisma.AddressScalarWhereInput[]
   id?: Prisma.IntFilter<"Address"> | number
   user_id?: Prisma.IntFilter<"Address"> | number
-  label?: Prisma.StringNullableFilter<"Address"> | string | null
+  label?: Prisma.StringFilter<"Address"> | string
   recipient_name?: Prisma.StringFilter<"Address"> | string
-  phone?: Prisma.StringNullableFilter<"Address"> | string | null
+  phone?: Prisma.StringFilter<"Address"> | string
   street?: Prisma.StringFilter<"Address"> | string
-  city?: Prisma.StringFilter<"Address"> | string
   province?: Prisma.StringFilter<"Address"> | string
+  province_code?: Prisma.StringFilter<"Address"> | string
+  city?: Prisma.StringFilter<"Address"> | string
+  city_code?: Prisma.StringFilter<"Address"> | string
+  district?: Prisma.StringFilter<"Address"> | string
+  district_code?: Prisma.StringFilter<"Address"> | string
+  village?: Prisma.StringFilter<"Address"> | string
+  village_code?: Prisma.StringFilter<"Address"> | string
   postal_code?: Prisma.StringFilter<"Address"> | string
   is_default?: Prisma.BoolFilter<"Address"> | boolean
   created_at?: Prisma.DateTimeFilter<"Address"> | Date | string
@@ -666,12 +816,18 @@ export type AddressScalarWhereInput = {
 }
 
 export type AddressCreateWithoutOrdersInput = {
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -682,12 +838,18 @@ export type AddressCreateWithoutOrdersInput = {
 export type AddressUncheckedCreateWithoutOrdersInput = {
   id?: number
   user_id: number
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -711,12 +873,18 @@ export type AddressUpdateToOneWithWhereWithoutOrdersInput = {
 }
 
 export type AddressUpdateWithoutOrdersInput = {
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -727,12 +895,18 @@ export type AddressUpdateWithoutOrdersInput = {
 export type AddressUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   user_id?: Prisma.IntFieldUpdateOperationsInput | number
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -741,12 +915,18 @@ export type AddressUncheckedUpdateWithoutOrdersInput = {
 
 export type AddressCreateManyUserInput = {
   id?: number
-  label?: string | null
+  label: string
   recipient_name: string
-  phone?: string | null
+  phone: string
   street: string
-  city: string
   province: string
+  province_code: string
+  city: string
+  city_code: string
+  district: string
+  district_code: string
+  village: string
+  village_code: string
   postal_code: string
   is_default?: boolean
   created_at?: Date | string
@@ -754,12 +934,18 @@ export type AddressCreateManyUserInput = {
 }
 
 export type AddressUpdateWithoutUserInput = {
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -769,12 +955,18 @@ export type AddressUpdateWithoutUserInput = {
 
 export type AddressUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -784,12 +976,18 @@ export type AddressUncheckedUpdateWithoutUserInput = {
 
 export type AddressUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  label?: Prisma.StringFieldUpdateOperationsInput | string
   recipient_name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
-  city?: Prisma.StringFieldUpdateOperationsInput | string
   province?: Prisma.StringFieldUpdateOperationsInput | string
+  province_code?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  district?: Prisma.StringFieldUpdateOperationsInput | string
+  district_code?: Prisma.StringFieldUpdateOperationsInput | string
+  village?: Prisma.StringFieldUpdateOperationsInput | string
+  village_code?: Prisma.StringFieldUpdateOperationsInput | string
   postal_code?: Prisma.StringFieldUpdateOperationsInput | string
   is_default?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -834,8 +1032,14 @@ export type AddressSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   recipient_name?: boolean
   phone?: boolean
   street?: boolean
-  city?: boolean
   province?: boolean
+  province_code?: boolean
+  city?: boolean
+  city_code?: boolean
+  district?: boolean
+  district_code?: boolean
+  village?: boolean
+  village_code?: boolean
   postal_code?: boolean
   is_default?: boolean
   created_at?: boolean
@@ -852,8 +1056,14 @@ export type AddressSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   recipient_name?: boolean
   phone?: boolean
   street?: boolean
-  city?: boolean
   province?: boolean
+  province_code?: boolean
+  city?: boolean
+  city_code?: boolean
+  district?: boolean
+  district_code?: boolean
+  village?: boolean
+  village_code?: boolean
   postal_code?: boolean
   is_default?: boolean
   created_at?: boolean
@@ -868,8 +1078,14 @@ export type AddressSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   recipient_name?: boolean
   phone?: boolean
   street?: boolean
-  city?: boolean
   province?: boolean
+  province_code?: boolean
+  city?: boolean
+  city_code?: boolean
+  district?: boolean
+  district_code?: boolean
+  village?: boolean
+  village_code?: boolean
   postal_code?: boolean
   is_default?: boolean
   created_at?: boolean
@@ -884,15 +1100,21 @@ export type AddressSelectScalar = {
   recipient_name?: boolean
   phone?: boolean
   street?: boolean
-  city?: boolean
   province?: boolean
+  province_code?: boolean
+  city?: boolean
+  city_code?: boolean
+  district?: boolean
+  district_code?: boolean
+  village?: boolean
+  village_code?: boolean
   postal_code?: boolean
   is_default?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type AddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "label" | "recipient_name" | "phone" | "street" | "city" | "province" | "postal_code" | "is_default" | "created_at" | "updated_at", ExtArgs["result"]["address"]>
+export type AddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "label" | "recipient_name" | "phone" | "street" | "province" | "province_code" | "city" | "city_code" | "district" | "district_code" | "village" | "village_code" | "postal_code" | "is_default" | "created_at" | "updated_at", ExtArgs["result"]["address"]>
 export type AddressInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Address$ordersArgs<ExtArgs>
@@ -914,12 +1136,18 @@ export type $AddressPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     user_id: number
-    label: string | null
+    label: string
     recipient_name: string
-    phone: string | null
+    phone: string
     street: string
-    city: string
     province: string
+    province_code: string
+    city: string
+    city_code: string
+    district: string
+    district_code: string
+    village: string
+    village_code: string
     postal_code: string
     is_default: boolean
     created_at: Date
@@ -1355,8 +1583,14 @@ export interface AddressFieldRefs {
   readonly recipient_name: Prisma.FieldRef<"Address", 'String'>
   readonly phone: Prisma.FieldRef<"Address", 'String'>
   readonly street: Prisma.FieldRef<"Address", 'String'>
-  readonly city: Prisma.FieldRef<"Address", 'String'>
   readonly province: Prisma.FieldRef<"Address", 'String'>
+  readonly province_code: Prisma.FieldRef<"Address", 'String'>
+  readonly city: Prisma.FieldRef<"Address", 'String'>
+  readonly city_code: Prisma.FieldRef<"Address", 'String'>
+  readonly district: Prisma.FieldRef<"Address", 'String'>
+  readonly district_code: Prisma.FieldRef<"Address", 'String'>
+  readonly village: Prisma.FieldRef<"Address", 'String'>
+  readonly village_code: Prisma.FieldRef<"Address", 'String'>
   readonly postal_code: Prisma.FieldRef<"Address", 'String'>
   readonly is_default: Prisma.FieldRef<"Address", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"Address", 'DateTime'>

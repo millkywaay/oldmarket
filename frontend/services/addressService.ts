@@ -13,3 +13,7 @@ export const updateAddress = async (id: number, addressData: any) => {
   const response = await api.patch("/user/addresses", { id, ...addressData });
   return response.data;
 };
+export const deleteAddress = async(id:number) => {
+  const response = await api.delete(`/user/addresses?id=${id}`);
+  return response.data;
+}
