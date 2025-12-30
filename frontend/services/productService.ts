@@ -1,10 +1,11 @@
 import api from './api';
 import { Product, Brand } from '../types';
 
-export const getAllProducts = async (p0: { limit: number; }): Promise<Product[]> => {
+export const getAllProducts = async (): Promise<Product[]> => {
   const response = await api.get('/products');
   return response.data;
 };
+
 
 export const getProductById = async (id: string): Promise<Product> => {
   const response = await api.get(`/products/${id}`);

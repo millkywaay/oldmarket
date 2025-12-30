@@ -83,7 +83,7 @@ export interface Product {
 export interface CartItem {
   id: string;
   product_id: string;
-  quantity: number;
+  qty: number;
   product?: Product;
   price?: number;
 }

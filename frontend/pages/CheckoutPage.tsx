@@ -1,154 +1,282 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
-import FormField from '../components/common/FormField';
-import Button from '../components/common/Button';
-import LoadingSpinner from '../components/common/LoadingSpinner';
-import * as orderService from '../services/orderService';
-import { DEFAULT_CURRENCY } from '../constants';
-import { CreditCard, Truck } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
+import Button from "../components/common/Button";
+import { MapPin, Truck, FileText, CreditCard } from "lucide-react";
+import { Address } from "../types";
+import * as addressService from "../services/addressService";
+import * as shippingService from "../services/shippingService";
+import AddressModal from "../components/checkout/AddressModal";
 
 const CheckoutPage: React.FC = () => {
-  const { 
-    getSelectedCartItems, 
-    getSelectedSubtotal, 
-    removeSelectedItems, 
-    selectedItemCount 
-  } = useCart();
-  const { user, token } = useAuth();
   const navigate = useNavigate();
-  
+  const { getSelectedCartItems, getSelectedSubtotal } = useCart();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [shippingOptions, setShippingOptions] = useState<any[]>([]);
+  const [selectedCourier, setSelectedCourier] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [orderNote, setOrderNote] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const selectedItems = getSelectedCartItems();
+  const subtotal = getSelectedSubtotal();
 
-  const [shippingAddress, setShippingAddress] = useState(user ? `${user.username}\n123 Football Lane\nJersey City, 12345` : '');
-  const [paymentMethod, setPaymentMethod] = useState('Manual Bank Transfer');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const totalWeightKg = selectedItems.reduce((total, item) => {
+    return total + item.qty * 0.5;
+  }, 0);
 
-  const handleSubmitOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !token) { setError('You must be logged in to place an order.'); return; }
-    if (selectedItemCount === 0) { setError('You have no items selected for checkout.'); navigate('/cart'); return; }
-    if (!shippingAddress.trim()) { setError('Shipping address is required.'); return; }
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
 
-    setIsProcessing(true);
-    setError(null);
-
+  const fetchAddresses = async () => {
     try {
-      const newOrder = await orderService.checkout(token, { shipping_address: shippingAddress, payment_method: paymentMethod });
-      await removeSelectedItems();
-      navigate(`/order-confirmation/${newOrder.id}`);
-    } catch (err: any) {
-      setError(err.message || 'Failed to place order. Please try again.');
-    } finally {
-      setIsProcessing(false);
+      const data = await addressService.getMyAddresses();
+      const list = Array.isArray(data) ? data : data?.data || [];
+      setAddresses(list);
+      const def = list.find((a: Address) => a.is_default) || list[0];
+      if (def) setSelectedAddress(def);
+    } catch (err) {
+      console.error("Gagal load alamat", err);
     }
   };
 
-  // Redirect if user lands here with no selected items.
   useEffect(() => {
-    if (!isProcessing && selectedItemCount === 0) {
-      navigate('/cart');
+    if (!selectedAddress?.village_code) return;
+    if (totalWeightKg <= 0) return;
+    handleShippingCheck(selectedAddress.village_code);
+  }, [selectedAddress, totalWeightKg]);
+
+  const handleShippingCheck = async (villageCode: string) => {
+    try {
+      const res = await shippingService.getShippingCost(
+        villageCode,
+        totalWeightKg
+      );
+
+      if (res?.is_success && res?.data?.couriers) {
+        const allowed = ["SiCepat", "JNE"];
+        const filtered = res.data.couriers.filter(
+          (c: any) =>
+            allowed.includes(c.courier_code) &&
+            !c.courier_code.toLowerCase().includes("cargo")
+        );
+
+        setShippingOptions(filtered);
+        if (filtered.length > 0) {
+          setSelectedCourier(filtered[0]);
+        }
+      }
+    } catch (err) {
+      console.error("Gagal ambil ongkir", err);
     }
-  }, [selectedItemCount, isProcessing, navigate]);
+  };
 
-  if (selectedItemCount === 0) {
-    return <LoadingSpinner message="No items selected. Redirecting..." />;
-  }
+  const handlePlaceOrder = () => {
+    if (!selectedAddress) return alert("Pilih alamat pengiriman!");
+    if (!selectedCourier) return alert("Pilih kurir terlebih dahulu!");
 
-  const subtotal = getSelectedSubtotal();
-  const shippingFee = subtotal > 500000 ? 0 : 25000;
-  const total = subtotal + shippingFee;
+    setIsLoading(true);
+    setTimeout(() => {
+      alert("Pesanan berhasil dibuat!");
+      setIsLoading(false);
+      navigate("/orders");
+    }, 2000);
+  };
 
   return (
-    <div className="bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <nav className="text-sm mb-6 text-gray-500">
-            <Link to="/home" className="hover:text-black">Home</Link>
-            <span className="mx-2">/</span>
-            <Link to="/cart" className="hover:text-black">Cart</Link>
-            <span className="mx-2">/</span>
-            <span className="text-black font-medium">Checkout</span>
-        </nav>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-black mb-8 text-center">Checkout</h1>
-        
-        {error && <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-center">{error}</div>}
+    <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans text-gray-900">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 
-        <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          {/* Shipping and Payment Forms */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border">
-              <section className="mb-8">
-                <h2 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2"><Truck size={20} /> Shipping Information</h2>
-                <FormField
-                  as="textarea"
-                  label="Shipping Address"
-                  name="shippingAddress"
-                  value={shippingAddress}
-                  onChange={(e) => setShippingAddress(e.target.value)}
-                  rows={5}
-                  placeholder="Enter your full shipping address..."
-                  required
-                  containerClassName="!mb-2"
-                />
-                 <p className="text-xs text-gray-500 mt-1">Shipping via Internal Courier only.</p>
-              </section>
-
-              <section>
-                <h2 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2"><CreditCard size={20} /> Payment Method</h2>
-                 <div className="space-y-3">
-                    <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${paymentMethod === 'Manual Bank Transfer' ? 'border-black ring-2 ring-black' : 'border-gray-300 hover:border-gray-400'}`}>
-                        <input type="radio" name="paymentMethod" value="Manual Bank Transfer" checked={paymentMethod === 'Manual Bank Transfer'} onChange={e => setPaymentMethod(e.target.value)} className="h-4 w-4 text-black focus:ring-black" />
-                        <span className="ml-3 font-medium">Manual Bank Transfer</span>
-                    </label>
-                    <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${paymentMethod === 'Internal Courier COD' ? 'border-black ring-2 ring-black' : 'border-gray-300 hover:border-gray-400'}`}>
-                        <input type="radio" name="paymentMethod" value="Internal Courier COD" checked={paymentMethod === 'Internal Courier COD'} onChange={e => setPaymentMethod(e.target.value)} className="h-4 w-4 text-black focus:ring-black" />
-                        <span className="ml-3 font-medium">Cash on Delivery (COD)</span>
-                    </label>
-                </div>
-              </section>
+          {/* SECTION ALAMAT */}
+          <div className="bg-white p-5 rounded-2xl border shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2 font-bold text-gray-700 uppercase text-xs tracking-wider">
+                <MapPin size={16} className="text-red-500" /> Alamat Pengiriman
+              </div>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="text-xs font-bold text-blue-600 hover:underline"
+              >
+                Ubah Alamat
+              </button>
+            </div>
+            {selectedAddress ? (
+              <div className="text-sm border-l-4 border-red-500 pl-4 py-1">
+                <p className="font-bold">
+                  {selectedAddress.recipient_name}{" "}
+                  <span className="text-gray-400 font-normal">
+                    | {selectedAddress.phone}
+                  </span>
+                </p>
+                <p className="text-gray-600 mt-1">
+                  {selectedAddress.street}, {selectedAddress.city}
+                </p>
+              </div>
+            ) : (
+              <div className="p-4 border-2 border-dashed rounded-xl text-center text-gray-400 text-sm">
+                Belum ada alamat. Silakan tambah alamat di profil.
+              </div>
+            )}
           </div>
 
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-             <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-24">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Order</h2>
-                <div className="space-y-4 max-h-60 overflow-y-auto pr-2 mb-4">
-                  {selectedItems.map(item => (
-                    <div key={item.product_id} className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <img src={item.product?.image_url} alt={item.product?.name} className="w-12 h-12 object-cover rounded-md"/>
-                        <div>
-                           <p className="font-medium text-gray-800">{item.product?.name}</p>
-                           <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                        </div>
-                      </div>
-                      <span className="font-mono">{DEFAULT_CURRENCY} {(item.product?.price || 0 * item.quantity).toLocaleString('id-ID')}</span>
+          {/* SECTION PRODUK */}
+          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+            <div className="p-4 border-b bg-gray-50 font-bold text-[10px] text-gray-400 uppercase tracking-widest">
+              Daftar Produk
+            </div>
+            <div className="p-4 space-y-4">
+              {selectedItems.map((item) => (
+                <div key={item.id} className="flex gap-4 items-center">
+                  <img
+                    src={item.product?.image_url || ""}
+                    className="w-16 h-16 object-cover rounded-xl bg-gray-50"
+                  />
+                  <div className="flex-1 flex justify-between items-center">
+                    <div>
+                      <p className="font-bold text-sm line-clamp-1">
+                        {item.product?.name}
+                      </p>
+                      <p className="text-[10px] text-gray-400">
+                        Variasi: {item.product?.size || "Default"}
+                      </p>
+                      <p className="text-xs mt-1">
+                        Rp {Number(item.product?.price || 0).toLocaleString()} x{" "}
+                        {item.qty}
+                      </p>
                     </div>
-                  ))}
+                    <div className="text-right">
+                      <p className="font-bold text-sm">
+                        Rp{" "}
+                        {(
+                          (Number(item.product?.price) || 0) * (item.qty || 0)
+                        ).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="border-t pt-4 space-y-2">
-                   <div className="flex justify-between text-gray-600">
-                      <span>Subtotal</span>
-                      <span className="font-semibold">{DEFAULT_CURRENCY} {subtotal.toLocaleString('id-ID')}</span>
-                   </div>
-                   <div className="flex justify-between text-gray-600">
-                      <span>Shipping</span>
-                      <span className="font-semibold">{shippingFee > 0 ? `${DEFAULT_CURRENCY} ${shippingFee.toLocaleString('id-ID')}` : 'FREE'}</span>
-                   </div>
-                   <div className="flex justify-between font-bold text-lg text-gray-800 border-t pt-3 mt-3">
-                      <span>Total</span>
-                      <span>{DEFAULT_CURRENCY} {total.toLocaleString('id-ID')}</span>
-                   </div>
-                </div>
-                <Button type="submit" variant="primary" size="lg" className="w-full mt-6" isLoading={isProcessing}>
-                    Place Order
-                </Button>
+              ))}
+            </div>
+            <div className="p-4 bg-blue-50/50 border-t flex items-center gap-3">
+              <FileText size={18} className="text-blue-500" />
+              <input
+                type="text"
+                placeholder="Tambah catatan untuk pesanan ini..."
+                className="bg-transparent w-full text-sm outline-none placeholder:text-blue-300"
+                value={orderNote}
+                onChange={(e) => setOrderNote(e.target.value)}
+              />
             </div>
           </div>
-        </form>
+
+          {/* SECTION KURIR */}
+          <div className="bg-white p-5 rounded-2xl border shadow-sm">
+            <div className="flex items-center gap-2 font-bold text-gray-700 mb-4 text-[10px] uppercase tracking-widest">
+              <Truck size={16} className="text-blue-500" /> Pilih Pengiriman
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {shippingOptions.length > 0 ? (
+                shippingOptions.map((opt, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setSelectedCourier(opt)}
+                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                      selectedCourier?.courier_code === opt.courier_code
+                        ? "border-blue-600 bg-blue-50"
+                        : "border-gray-100 hover:border-gray-200"
+                    }`}
+                  >
+                    <p className="text-[10px] font-black text-gray-400 uppercase">
+                      {opt.courier_name}
+                    </p>
+
+                    <p className="font-bold text-blue-700 text-lg">
+                      Rp {opt.price.toLocaleString()}
+                    </p>
+
+                    <p className="text-[10px] text-gray-500">
+                      Estimasi: {opt.estimation ?? "-"}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-gray-400 italic col-span-3 text-center py-4 bg-gray-50 rounded-xl">
+                  {selectedAddress
+                    ? "Mencari kurir..."
+                    : "Pilih alamat untuk melihat ongkir"}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* SECTION PEMBAYARAN */}
+          <div className="bg-white p-5 rounded-2xl border shadow-sm">
+            <div className="flex items-center gap-2 font-bold text-gray-700 mb-4 text-[10px] uppercase tracking-widest">
+              <CreditCard size={16} className="text-green-500" /> Metode
+              Pembayaran
+            </div>
+            <div className="p-4 border-2 border-green-600 bg-green-50 rounded-xl flex justify-between items-center cursor-default">
+              <div>
+                <p className="font-bold text-green-800 text-sm">
+                  Manual Transfer Bank
+                </p>
+                <p className="text-[10px] text-green-600">
+                  BCA / BRI / Mandiri (Verifikasi Manual)
+                </p>
+              </div>
+              <div className="h-5 w-5 rounded-full bg-green-600 flex items-center justify-center shadow-md">
+                <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* KOLOM KANAN (SUMMARY) */}
+        <div className="lg:col-span-1">
+          <div className="bg-white p-6 rounded-3xl border shadow-lg sticky top-4">
+            <h3 className="font-bold text-lg mb-6 border-b pb-4">
+              Ringkasan Tagihan
+            </h3>
+            <div className="space-y-4 pb-6 border-b border-dashed">
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>Total Harga Produk</span>
+                <span>Rp {subtotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>Biaya Ongkos Kirim</span>
+                <span>Rp {(selectedCourier?.price || 0).toLocaleString()}</span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center pt-6 mb-8">
+              <span className="font-bold text-gray-800 text-lg">
+                Total Pembayaran
+              </span>
+              <span className="text-2xl font-black text-red-600 tracking-tighter">
+                Rp {(subtotal + (selectedCourier?.price || 0)).toLocaleString()}
+              </span>
+            </div>
+            <Button
+              className="w-full py-5 bg-red-600 hover:bg-red-700 text-white font-black text-lg rounded-2xl shadow-xl shadow-red-100 transition-all active:scale-95"
+              onClick={handlePlaceOrder}
+              isLoading={isLoading}
+            >
+              KONFIRMASI PESANAN
+            </Button>
+          </div>
+        </div>
       </div>
+
+      <AddressModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        addresses={addresses}
+        onSelect={(addr) => {
+          setSelectedAddress(addr);
+          setIsModalOpen(false);
+        }}
+      />
     </div>
   );
 };

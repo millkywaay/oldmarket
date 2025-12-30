@@ -158,7 +158,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const selectedItemCount = useMemo(() => {
     return cartItems
       .filter((item) => selectedProductIds.includes(item.product_id))
-      .reduce((count, item) => count + item.quantity, 0);
+      .reduce((count, item) => count + item.qty, 0);
   }, [cartItems, selectedProductIds]);
 
   return (
