@@ -1,7 +1,7 @@
 import api from './api';
 import { Product, Brand } from '../types';
 
-export const getAllProducts = async (): Promise<Product[]> => {
+export const getAllProducts = async (p0: { limit: number; }): Promise<Product[]> => {
   const response = await api.get('/products');
   return response.data;
 };

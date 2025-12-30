@@ -139,6 +139,12 @@ model Order {
   province        String        @db.VarChar(120)
   postal_code     String        @db.VarChar(16)
   
+  courier_name    String?       @db.VarChar(100)  
+  courier_service String?       @db.VarChar(100)
+  tracking_number String?       @db.VarChar(100)
+  payment_link    String?       @db.VarChar(255)
+  external_id     String?       @db.VarChar(100)
+  
   notes           String?       @db.VarChar(255)
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt

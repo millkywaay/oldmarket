@@ -1,8 +1,14 @@
-
-import React, { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import { CartItem, Product } from '../types';
-import * as cartService from '../services/cartService'; // Assuming service methods
-import { useAuth } from './AuthContext';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
+import { CartItem, Product } from "../types";
+import * as cartService from "../services/cartService";
+import { useAuth } from "./AuthContext";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -10,29 +16,34 @@ interface CartContextType {
   isLoading: boolean;
   error: string | null;
   addToCart: (product: Product, quantity: number) => Promise<void>;
-  updateCartItemQuantity: (productId: string, quantity: number) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
+  updateCartItemQuantity: (
+    productId: string | number,
+    quantity: number
+  ) => Promise<void>;
+  removeFromCart: (productId: string | number) => Promise<void>;
   clearCart: () => Promise<void>;
   removeSelectedItems: () => Promise<void>;
   getSelectedSubtotal: () => number;
   totalItemCount: number;
   selectedItemCount: number;
   fetchCart: () => Promise<void>;
-  toggleProductSelection: (productId: string) => void;
+  toggleProductSelection: (productId: string | number) => void;
   toggleSelectAll: () => void;
   areAllSelected: boolean;
   getSelectedCartItems: () => CartItem[];
 }
 
-export const CartContext = createContext<CartContextType | undefined>(undefined);
+export const CartContext = createContext<CartContextType | undefined>(
+  undefined
+);
 
-interface CartProviderProps {
-  children: ReactNode;
-}
-
-export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+export const CartProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [selectedProductIds, setSelectedProductIds] = useState<
+    (string | number)[]
+  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { token, user } = useAuth();
@@ -40,175 +51,133 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const fetchCart = useCallback(async () => {
     if (!token || !user) {
       setCartItems([]);
-      setSelectedProductIds([]);
       return;
     }
     setIsLoading(true);
-    setError(null);
     try {
-      const cart = await cartService.getCart(token);
-      setCartItems(cart.items);
-      // Select all items by default when cart is fetched
-      setSelectedProductIds(cart.items.map(item => item.product_id));
-    } catch (err: any)      {
-      setError(err.message || 'Failed to fetch cart');
-      setCartItems([]);
-      setSelectedProductIds([]);
+      const data = await cartService.getCart();
+      setCartItems(data.items);
+      setSelectedProductIds(data.items.map((item: any) => item.product_id));
+    } catch (err: any) {
+      console.error("Fetch Cart Error:", err);
     } finally {
       setIsLoading(false);
     }
   }, [token, user]);
 
-  // useEffect(() => {
-  //   fetchCart();
-  // }, [fetchCart]);
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
 
   const addToCart = async (product: Product, quantity: number) => {
-    if (!token) {
-      setError("Please login to add items to cart.");
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
+    if (!token) return;
     try {
-      // await cartService.addToCart(token, product.id, quantity);
-      setCartItems(prevItems => {
-        const existingItem = prevItems.find(item => item.product_id === product.id);
-        if (existingItem) {
-          return prevItems.map(item =>
-            item.product_id === product.id
-              ? { ...item, quantity: item.quantity + quantity, product }
-              : item
-          );
-        }
-        return [...prevItems, { id: product.id, product_id: product.id, quantity, product }];
-      });
-      // Also add the new item to the selected list
-      setSelectedProductIds(prev => [...new Set([...prev, product.id])]);
-      // await fetchCart();
+      await cartService.addToCart(product.id, quantity);
+      await fetchCart();
     } catch (err: any) {
-      setError(err.message || 'Failed to add to cart');
-    } finally {
-      setIsLoading(false);
+      setError("Gagal menambah ke keranjang");
     }
   };
 
-  const updateCartItemQuantity = async (productId: string, quantity: number) => {
-    if (!token) return;
-    setIsLoading(true);
-    setError(null);
+  const updateCartItemQuantity = async (
+    productId: number,
+    newQuantity: number
+  ) => {
     try {
-      // await cartService.updateItem(token, productId, quantity);
-      setCartItems(prevItems =>
-        prevItems.map(item =>
-          item.product_id === productId ? { ...item, quantity } : item
-        ).filter(item => item.quantity > 0)
+      await cartService.updateItem(productId, newQuantity);
+      await fetchCart();
+    } catch (err) {
+      console.error("Gagal update quantity", err);
+    }
+  };
+  const removeFromCart = async (productId: string | number) => {
+    if (!token) return;
+    try {
+      await cartService.removeItem(productId);
+      setCartItems((prev) =>
+        prev.filter((item) => item.product_id !== productId)
       );
-    } catch (err: any) {
-      setError(err.message || 'Failed to update cart item');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const removeFromCart = async (productId: string) => {
-    if (!token) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      // await cartService.removeItem(token, productId);
-      setCartItems(prevItems => prevItems.filter(item => item.product_id !== productId));
-      // Also remove from selection
-      setSelectedProductIds(prev => prev.filter(id => id !== productId));
-    } catch (err: any) {
-      setError(err.message || 'Failed to remove item from cart');
-    } finally {
-      setIsLoading(false);
+      setSelectedProductIds((prev) => prev.filter((id) => id !== productId));
+    } catch (err) {
+      setError("Gagal menghapus item");
     }
   };
 
   const clearCart = async () => {
-    if (!token) return;
-    setIsLoading(true);
-    setError(null);
     try {
-      // await cartService.clearCart(token);
+      await cartService.clearCart();
       setCartItems([]);
       setSelectedProductIds([]);
-    } catch (err: any) {
-      setError(err.message || 'Failed to clear cart');
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error(err);
     }
   };
-  
+
   const removeSelectedItems = async () => {
-    if(!token) return;
-    try {
-        // This would be a single API call in a real backend
-        setCartItems(prev => prev.filter(item => !selectedProductIds.includes(item.product_id)));
-        setSelectedProductIds([]);
-    } catch(err: any) {
-        setError(err.message || 'Failed to remove purchased items');
+    for (const id of selectedProductIds) {
+      await cartService.removeItem(id);
     }
+    await fetchCart();
   };
-  
-  const toggleProductSelection = (productId: string) => {
-    setSelectedProductIds(prev =>
-        prev.includes(productId)
-            ? prev.filter(id => id !== productId)
-            : [...prev, productId]
+
+  const toggleProductSelection = (productId: string | number) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
     );
   };
 
-  const areAllSelected = useMemo(() => cartItems.length > 0 && selectedProductIds.length === cartItems.length, [cartItems, selectedProductIds]);
+  const areAllSelected = useMemo(
+    () =>
+      cartItems.length > 0 && selectedProductIds.length === cartItems.length,
+    [cartItems, selectedProductIds]
+  );
 
   const toggleSelectAll = () => {
-    if (areAllSelected) {
-        setSelectedProductIds([]);
-    } else {
-        setSelectedProductIds(cartItems.map(item => item.product_id));
-    }
+    setSelectedProductIds(
+      areAllSelected ? [] : cartItems.map((item) => item.product_id)
+    );
   };
 
-  const getSelectedCartItems = () => {
-    return cartItems.filter(item => selectedProductIds.includes(item.product_id));
-  };
-  
+  const getSelectedCartItems = () =>
+    cartItems.filter((item) => selectedProductIds.includes(item.product_id));
   const getSelectedSubtotal = () => {
-    return cartItems
-      .filter(item => selectedProductIds.includes(item.product_id))
-      .reduce((total, item) => {
-        const price = item.product?.price || 0;
-        return total + price * item.quantity;
-      }, 0);
+    return cartItems.reduce((total, item) => {
+      if (!selectedProductIds.includes(item.product_id)) return total;
+      if (!item.product) return total;
+
+      const price = Number(item.product.price) || 0;
+      const qty = (item as any).quantity ?? (item as any).qty ?? 0;
+
+      return total + price * qty;
+    }, 0);
   };
 
-  const totalItemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+  const totalItemCount = cartItems.length;
   const selectedItemCount = useMemo(() => {
     return cartItems
-      .filter(item => selectedProductIds.includes(item.product_id))
+      .filter((item) => selectedProductIds.includes(item.product_id))
       .reduce((count, item) => count + item.quantity, 0);
   }, [cartItems, selectedProductIds]);
-
 
   return (
     <CartContext.Provider
       value={{
         cartItems,
-        selectedProductIds,
+        selectedProductIds: selectedProductIds as string[],
         isLoading,
         error,
         addToCart,
-        updateCartItemQuantity,
-        removeFromCart,
+        updateCartItemQuantity: updateCartItemQuantity as any,
+        removeFromCart: removeFromCart as any,
         clearCart,
         removeSelectedItems,
         getSelectedSubtotal,
         totalItemCount,
         selectedItemCount,
         fetchCart,
-        toggleProductSelection,
+        toggleProductSelection: toggleProductSelection as any,
         toggleSelectAll,
         areAllSelected,
         getSelectedCartItems,
@@ -219,10 +188,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   );
 };
 
-export const useCart = (): CartContextType => {
+export const useCart = () => {
   const context = React.useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
+  if (!context) throw new Error("useCart must be used within a CartProvider");
   return context;
 };

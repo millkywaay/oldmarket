@@ -1,45 +1,43 @@
-// import { Cart, CartItem } from '../types';
+import { CartItem } from "../types";
+import api from "./api";
 
-// const BASE = "http://localhost:3000/api/cart";
+const BASE = "/cart";
 
-// export const getCart = async (token: string): Promise<Cart> => {
-//   const response = await fetch(BASE, {
-//     headers: { 'Authorization': `Bearer ${token}` }
-//   });
-//   if (!response.ok) throw new Error("Gagal mengambil keranjang");
-//   return await response.json();
-// };
+export const getCart = async () => {
+  const response = await api.get(BASE);
+  return response.data;
+};
 
-// export const addToCart = async (token: string, productId: string, quantity: number): Promise<CartItem> => {
-//   const response = await fetch(`${BASE}/add`, {
-//     method: 'POST',
-//     headers: { 
-//       'Content-Type': 'application/json',
-//       'Authorization': `Bearer ${token}` 
-//     },
-//     body: JSON.stringify({ product_id: productId, quantity }),
-//   });
-//   if (!response.ok) throw new Error("Gagal menambah ke keranjang");
-//   return await response.json();
-// };
+export const addToCart = async (productId: string | number, quantity: number) => {
+  const response = await api.post(BASE, {
+    product_id: productId,
+    quantity: quantity,
+  });
+  return response.data;
+};
 
-// export const updateItem = async (token: string, cartItemId: string, quantity: number): Promise<CartItem> => {
-//   const response = await fetch(`${BASE}/item/${cartItemId}`, {
-//     method: 'PUT',
-//     headers: { 
-//       'Content-Type': 'application/json',
-//       'Authorization': `Bearer ${token}` 
-//     },
-//     body: JSON.stringify({ quantity }),
-//   });
-//   if (!response.ok) throw new Error("Gagal update item");
-//   return await response.json();
-// };
+export const updateItem = async (
+  productId: string | number,
+  quantity: number
+): Promise<CartItem | { message: string }> => {
+  const response = await api.patch(BASE, {
+    product_id: productId,
+    quantity,
+  });
+  return response.data;
+};
 
-// export const removeItem = async (token: string, cartItemId: string): Promise<void> => {
-//   const response = await fetch(`${BASE}/item/${cartItemId}`, {
-//     method: 'DELETE',
-//     headers: { 'Authorization': `Bearer ${token}` },
-//   });
-//   if (!response.ok) throw new Error("Gagal menghapus item");
-// };
+
+export const removeItem = async (
+  productId: string | number
+): Promise<{ message: string }> => {
+  const response = await api.delete(BASE, {
+    params: { product_id: productId },
+  });
+  return response.data;
+};
+
+export const clearCart = async (): Promise<{ message: string }> => {
+  const response = await api.delete(BASE);
+  return response.data;
+};

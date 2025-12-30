@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import * as cartService from '../services/cartService';
 import { Product } from '../types';
 import * as productService from '../services/productService';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
 import ProductCard from '../components/common/ProductCard';
 import { DEFAULT_CURRENCY } from '../constants';
-import { useCart } from '../contexts/CartContext';
 import { Minus, Plus, ShoppingCart, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
+  const navigate = useNavigate();
+  const { token } = useAuth();
+  const { addToCart, fetchCart, isLoading: isCartLoading } = useCart();
+  const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  
-  const { addToCart, isLoading: isCartLoading } = useCart();
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -41,6 +45,22 @@ const ProductDetailPage: React.FC = () => {
     };
     fetchDetail();
   }, [productId]);
+
+  const handleBuyNow = async () => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    setIsBuyNowLoading(true);
+    try {
+      await cartService.addToCart(token, product!.id, quantity);
+      await fetchCart();
+      navigate('/checkout');
+    } catch (err) {
+      console.error("Failed Buy Now action", err);
+      alert("Gagal memproses pembelian. Silakan coba lagi.");
+    }
+  };
 
   const nextImage = () => {
     if (product?.images && product.images.length > 0) {
@@ -103,7 +123,7 @@ const ProductDetailPage: React.FC = () => {
               {allImages.map((img, index) => (
                 <div 
                   key={index}
-                  onMouseEnter={() => setActiveImageIndex(index)} // Ganti gambar saat hover
+                  onMouseEnter={() => setActiveImageIndex(index)}
                   className={`relative flex-shrink-0 w-20 h-20 rounded border-2 cursor-pointer overflow-hidden transition-all ${
                     activeImageIndex === index ? 'border-blue-600 ring-2 ring-blue-100' : 'border-transparent hover:border-gray-300'
                   }`}
@@ -175,15 +195,20 @@ const ProductDetailPage: React.FC = () => {
                     variant="primary" 
                     className="flex-1 h-12 rounded-sm font-bold"
                     leftIcon={<ShoppingCart size={20} />}
-                    onClick={() => {
-                        addToCart(product, quantity);
-                        alert("Berhasil masuk keranjang!");
+                    onClick={async () => {
+                      await addToCart(product, quantity);
+                      alert("Berhasil masuk keranjang!");
                     }}
                     isLoading={isCartLoading}
                   >
                     Masukkan Keranjang
                   </Button>
-                  <Button variant="outline" className="flex-1 h-12 rounded-sm border-blue-600 text-blue-600 font-bold">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 h-12 rounded-sm border-blue-600 text-blue-600 font-bold"
+                    onClick={handleBuyNow}
+                    isLoading={isBuyNowLoading}
+                  >
                     Beli Sekarang
                   </Button>
                 </div>

@@ -85,7 +85,7 @@ export interface CartItem {
   product_id: string;
   quantity: number;
   product?: Product;
-  price_at_addition?: number;
+  price?: number;
 }
 
 export interface Cart {

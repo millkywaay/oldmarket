@@ -68,7 +68,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
       return;
     }
-    const storedToken = localStorage.getItem("authToken");
     try {
       const response = await api.get("/auth/me");
       const latestUser = response.data;

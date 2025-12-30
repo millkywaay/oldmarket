@@ -21,23 +21,23 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    productService
-      .getAllProducts({ limit: 500 })
-      .then((response) => {
-        setAllProducts(response.items);
-      })
-      .catch((err) => {
-        console.error("Failed to load products for search:", err);
-      });
-  }, []);
-
+  productService
+    .getAllProducts({ limit: 20 })
+    .then((response) => {
+      if (response && response.items) {
+        setAllProducts(response.items as unknown as Product[]);
+      }
+    })
+    .catch((err) => {
+      console.error("Failed to load products for search:", err);
+    });
+}, []);
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
@@ -198,12 +198,11 @@ const Navbar: React.FC = () => {
               {shouldShowCart && (
                 <Link
                   to="/cart"
-                  className="relative text-gray-700 hover:text-black"
-                  aria-label="Shopping Cart"
+                  className="relative p-2 text-gray-700 hover:text-black transition-colors"
                 >
-                  <ShoppingCart className="w-6 h-6" />
+                  <ShoppingCart size={24} />
                   {totalItemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    <span className="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                       {totalItemCount}
                     </span>
                   )}
