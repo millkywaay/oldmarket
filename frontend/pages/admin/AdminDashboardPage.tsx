@@ -58,7 +58,7 @@ const AdminDashboardPage: React.FC = () => {
 
       {/* Key Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Revenue" value={`IDR ${summary.totalRevenue.toLocaleString('id-ID')}`} icon={<DollarSign/>} colorClass="border-green-500" linkTo="/admin/reports" />
+        <StatCard title="Total Revenue" value={`Rp ${summary.totalRevenue.toLocaleString('id-ID')}`} icon={<DollarSign/>} colorClass="border-green-500" linkTo="/admin/reports" />
         <StatCard title="Total Orders" value={summary.totalOrders} icon={<ShoppingCart/>} colorClass="border-blue-500" linkTo="/admin/orders" />
         <StatCard title="Total Products" value={summary.totalProducts} icon={<Archive/>} colorClass="border-purple-500" linkTo="/admin/products" />
         <StatCard title="Low Stock Items" value={summary.lowStockItemsCount} icon={<AlertTriangle/>} colorClass="border-red-500" linkTo="/admin/products?filter=lowstock" />

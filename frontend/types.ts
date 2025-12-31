@@ -119,7 +119,7 @@ export interface Order {
   order_status: OrderStatus;
   shipping_address: string; 
   payment_method: string; 
-  transaction_currency: 'IDR';
+  transaction_currency: 'Rp';
   created_at: string;
   updated_at?: string;
   items: OrderItem[];

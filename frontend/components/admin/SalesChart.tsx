@@ -31,10 +31,10 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, type = 'bar', title = "Sa
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
           <XAxis dataKey="date" stroke="#6b7280" />
-          <YAxis yAxisId="left" orientation="left" stroke="#1D4ED8" label={{ value: 'Revenue (IDR)', angle: -90, position: 'insideLeft', fill:"#1D4ED8" }}/>
+          <YAxis yAxisId="left" orientation="left" stroke="#1D4ED8" label={{ value: 'Revenue (Rp)', angle: -90, position: 'insideLeft', fill:"#1D4ED8" }}/>
           <YAxis yAxisId="right" orientation="right" stroke="#10B981" label={{ value: 'Orders', angle: -90, position: 'insideRight', fill:"#10B981" }}/>
           <Tooltip formatter={(value: number, name: string) => {
-            if (name === 'revenue') return [`${value.toLocaleString('id-ID')} IDR`, 'Revenue'];
+            if (name === 'revenue') return [`${value.toLocaleString('id-ID')} Rp`, 'Revenue'];
             if (name === 'orders') return [value, 'Orders'];
             return [value, name];
           }}/>

@@ -108,7 +108,7 @@ export default function ProductForm({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FormField
-          label="Price (IDR)"
+          label="Price (Rp)"
           name="price"
           type="number"
           value={form.price}

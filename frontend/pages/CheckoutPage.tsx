@@ -7,6 +7,7 @@ import { Address } from "../types";
 import * as addressService from "../services/addressService";
 import * as shippingService from "../services/shippingService";
 import AddressModal from "../components/checkout/AddressModal";
+import { useLocation } from "react-router-dom";
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,8 +19,20 @@ const CheckoutPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [orderNote, setOrderNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const selectedItems = getSelectedCartItems();
-  const subtotal = getSelectedSubtotal();
+  const location = useLocation();
+  const buyNowItem = location.state?.buyNowItem;
+  const subtotal = buyNowItem
+    ? buyNowItem.product.price * buyNowItem.qty
+    : getSelectedSubtotal();
+  const selectedItems = buyNowItem
+    ? [
+        {
+          id: "buy-now",
+          product: buyNowItem.product,
+          qty: buyNowItem.qty,
+        },
+      ]
+    : getSelectedCartItems();
 
   const totalWeightKg = selectedItems.reduce((total, item) => {
     return total + item.qty * 0.5;
