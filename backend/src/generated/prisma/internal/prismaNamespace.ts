@@ -1144,6 +1144,11 @@ export const OrderScalarFieldEnum = {
   city: 'city',
   province: 'province',
   postal_code: 'postal_code',
+  courier_name: 'courier_name',
+  courier_service: 'courier_service',
+  tracking_number: 'tracking_number',
+  payment_link: 'payment_link',
+  external_id: 'external_id',
   notes: 'notes',
   created_at: 'created_at',
   updated_at: 'updated_at'

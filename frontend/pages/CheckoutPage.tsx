@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import Button from "../components/common/Button";
-import { MapPin, Truck, FileText, CreditCard } from "lucide-react";
+import { MapPin, Truck, FileText } from "lucide-react";
 import { Address } from "../types";
 import * as addressService from "../services/addressService";
 import * as shippingService from "../services/shippingService";
 import AddressModal from "../components/checkout/AddressModal";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const { getSelectedCartItems, getSelectedSubtotal } = useCart();
+  const { user } = useAuth()
+  const { getSelectedCartItems, getSelectedSubtotal, fetchCart } = useCart();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [shippingOptions, setShippingOptions] = useState<any[]>([]);
@@ -85,18 +87,53 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handlePlaceOrder = () => {
-    if (!selectedAddress) return alert("Pilih alamat pengiriman!");
-    if (!selectedCourier) return alert("Pilih kurir terlebih dahulu!");
+const handlePlaceOrder = async () => {
+    if (!user) return alert("Silakan login terlebih dahulu untuk memesan.");
+    if (!selectedAddress || !selectedCourier) return alert("Lengkapi data pengiriman!");
 
     setIsLoading(true);
-    setTimeout(() => {
-      alert("Pesanan berhasil dibuat!");
-      setIsLoading(false);
-      navigate("/orders");
-    }, 2000);
-  };
+    try {
+      const orderData = {
+        userId: user.id, 
+        cartItems: selectedItems.map(item => ({
+          product_id: item.product.id,
+          qty: item.qty,
+          product: item.product
+        })),
+        subtotal: subtotal,
+        shippingFee: selectedCourier.price,
+        addressId: selectedAddress.id,
+        notes: orderNote,
+        courierName: selectedCourier.courier_name,
+        courierService: selectedCourier.courier_code
+      };
 
+      const response = await fetch('http://localhost:3000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        throw new Error("Respon server bukan JSON yang valid.");
+      }
+
+      if (!response.ok) throw new Error(result.error || "Gagal membuat pesanan");
+      await fetchCart(); 
+
+      alert("Pesanan berhasil dibuat!");
+      navigate("/orders"); 
+      
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans text-gray-900">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -223,27 +260,6 @@ const CheckoutPage: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* SECTION PEMBAYARAN */}
-          <div className="bg-white p-5 rounded-2xl border shadow-sm">
-            <div className="flex items-center gap-2 font-bold text-gray-700 mb-4 text-[10px] uppercase tracking-widest">
-              <CreditCard size={16} className="text-green-500" /> Metode
-              Pembayaran
-            </div>
-            <div className="p-4 border-2 border-green-600 bg-green-50 rounded-xl flex justify-between items-center cursor-default">
-              <div>
-                <p className="font-bold text-green-800 text-sm">
-                  Manual Transfer Bank
-                </p>
-                <p className="text-[10px] text-green-600">
-                  BCA / BRI / Mandiri (Verifikasi Manual)
-                </p>
-              </div>
-              <div className="h-5 w-5 rounded-full bg-green-600 flex items-center justify-center shadow-md">
-                <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* KOLOM KANAN (SUMMARY) */}
@@ -275,7 +291,7 @@ const CheckoutPage: React.FC = () => {
               onClick={handlePlaceOrder}
               isLoading={isLoading}
             >
-              KONFIRMASI PESANAN
+              LANJUT PEMBAYARAN
             </Button>
           </div>
         </div>
