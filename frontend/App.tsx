@@ -5,7 +5,6 @@ import AllProductsPage from "./pages/AllProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import ShoppingCartPage from "./pages/ShoppingCartPage";
 import CheckoutPage from "./pages/CheckoutPage";
-import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import UserLoginPage from "./pages/UserLoginPage";
 import UserRegistrationPage from "./pages/UserRegistrationPage";
@@ -21,7 +20,7 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import { UserRole } from "./types";
 import AdminLayout from "./components/layout/AdminLayout";
 import CustomerLayout from "./components/layout/CustomerLayout";
-
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import AddProductPage from "./pages/admin/AddProductPage";
 import EditProductPage from "./pages/admin/EditProductPage";
 
@@ -41,6 +40,7 @@ const App: React.FC = () => {
             <Route path="/new-arrival" element={<NewArrivalPage />} />
             <Route path="/top-selling" element={<TopSellingPage />} />
             <Route path="/product/:productId" element={<ProductDetailPage />} />
+            <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
 
             {/* USER ONLY */}
             <Route element={<ProtectedRoute roles={[UserRole.USER]} />}>

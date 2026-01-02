@@ -172,7 +172,6 @@ export const OrderScalarFieldEnum = {
   subtotal_amount: 'subtotal_amount',
   shipping_amount: 'shipping_amount',
   grand_total: 'grand_total',
-  address_id: 'address_id',
   recipient_name: 'recipient_name',
   phone: 'phone',
   street: 'street',

@@ -37,7 +37,7 @@ const CheckoutPage: React.FC = () => {
     : getSelectedCartItems();
 
   const totalWeightKg = selectedItems.reduce((total, item) => {
-    return total + item.qty * 0.5;
+    return total + item.qty * 1;
   }, 0);
 
   useEffect(() => {
@@ -95,10 +95,10 @@ const handlePlaceOrder = async () => {
     try {
       const orderData = {
         userId: user.id, 
+        orderType: buyNowItem ? "BUY_NOW" : "CART", 
         cartItems: selectedItems.map(item => ({
           product_id: item.product.id,
           qty: item.qty,
-          product: item.product
         })),
         subtotal: subtotal,
         shippingFee: selectedCourier.price,
@@ -124,9 +124,8 @@ const handlePlaceOrder = async () => {
 
       if (!response.ok) throw new Error(result.error || "Gagal membuat pesanan");
       await fetchCart(); 
-
       alert("Pesanan berhasil dibuat!");
-      navigate("/orders"); 
+      navigate(`/order-confirmation/${result.data.id}`);
       
     } catch (err: any) {
       alert("Error: " + err.message);

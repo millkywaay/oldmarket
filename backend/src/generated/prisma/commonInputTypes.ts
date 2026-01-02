@@ -272,23 +272,6 @@ export type EnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumPaymentStatusFilter<$PrismaModel>
 }
 
-export type EnumSizeFilter<$PrismaModel = never> = {
-  equals?: $Enums.Size | Prisma.EnumSizeFieldRefInput<$PrismaModel>
-  in?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSizeFilter<$PrismaModel> | $Enums.Size
-}
-
-export type EnumSizeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Size | Prisma.EnumSizeFieldRefInput<$PrismaModel>
-  in?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSizeWithAggregatesFilter<$PrismaModel> | $Enums.Size
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumSizeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumSizeFilter<$PrismaModel>
-}
-
 export type NestedIntFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -558,23 +541,6 @@ export type NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPaymentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPaymentStatusFilter<$PrismaModel>
-}
-
-export type NestedEnumSizeFilter<$PrismaModel = never> = {
-  equals?: $Enums.Size | Prisma.EnumSizeFieldRefInput<$PrismaModel>
-  in?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSizeFilter<$PrismaModel> | $Enums.Size
-}
-
-export type NestedEnumSizeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.Size | Prisma.EnumSizeFieldRefInput<$PrismaModel>
-  in?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.Size[] | Prisma.ListEnumSizeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumSizeWithAggregatesFilter<$PrismaModel> | $Enums.Size
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumSizeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumSizeFilter<$PrismaModel>
 }
 
 

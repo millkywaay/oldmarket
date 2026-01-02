@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 enum Role {
@@ -43,128 +43,123 @@ model User {
   role               Role       @default(USER)
   default_address_id Int?       @unique
   addresses          Address[]  @relation("UserAddresses")
-  cart_items        CartItem[]
+  cart_items         CartItem[]
   orders             Order[]
   created_at         DateTime   @default(now())
   updated_at         DateTime   @updatedAt
 }
 
 model Address {
-  id             Int       @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   user_id        Int
-  label          String    @db.VarChar(60)
-  recipient_name String    @db.VarChar(120)
-  phone          String    @db.VarChar(32)
-  street         String    @db.VarChar(255)
-  province       String    @db.VarChar(120)
-  province_code  String    @db.VarChar(16)
-  city           String    @db.VarChar(120)
-  city_code      String    @db.VarChar(16)
-  district       String    @db.VarChar(120)
-  district_code  String    @db.VarChar(16)
-  village        String    @db.VarChar(120)
-  village_code   String    @db.VarChar(16)
-  postal_code    String    @db.VarChar(16)
-  is_default     Boolean   @default(false)
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  label          String   @db.VarChar(60)
+  recipient_name String   @db.VarChar(120)
+  phone          String   @db.VarChar(32)
+  street         String   @db.VarChar(255)
+  province       String   @db.VarChar(120)
+  province_code  String   @db.VarChar(16)
+  city           String   @db.VarChar(120)
+  city_code      String   @db.VarChar(16)
+  district       String   @db.VarChar(120)
+  district_code  String   @db.VarChar(16)
+  village        String   @db.VarChar(120)
+  village_code   String   @db.VarChar(16)
+  postal_code    String   @db.VarChar(16)
+  is_default     Boolean  @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
-  user           User      @relation("UserAddresses", fields: [user_id], references: [id], onDelete: Cascade)
-  orders         Order[]
+  user User @relation("UserAddresses", fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Brand {
-  id      Int  @id @default(autoincrement())
-  name    String  @unique
+  id      Int       @id @default(autoincrement())
+  name    String    @unique
   Product Product[]
 }
 
 model Product {
-  id          Int   @id @default(autoincrement())
-  brand_id    Int
-  name        String    @db.VarChar(160)
-  description String?   @db.Text
-  price       Decimal   @db.Decimal(12,2)
-  size        Size?
-  stock_quantity      Int    @default(0)
-  image_url   String?
-  is_active   Boolean   @default(true)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  id             Int      @id @default(autoincrement())
+  brand_id       Int
+  name           String   @db.VarChar(160)
+  description    String?  @db.Text
+  price          Decimal  @db.Decimal(12, 2)
+  size           Size?
+  stock_quantity Int      @default(0)
+  image_url      String?
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
-  brand   Brand          @relation(fields: [brand_id], references: [id])
-  images  ProductImage[]
-  cart_items     CartItem[]
-  order_items    OrderItem[]
+  brand      Brand          @relation(fields: [brand_id], references: [id])
+  images     ProductImage[]
+  cart_items CartItem[]
 }
 
-
 model CartItem {
-  id                 Int           @id @default(autoincrement())
-  user_id            Int
-  product_id         Int
-  qty                Int
-  created_at         DateTime      @default(now())
-  updated_at         DateTime      @updatedAt
-  user               User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  product            Product @relation(fields: [product_id], references: [id])
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  qty        Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [product_id], references: [id])
 
   @@unique([user_id, product_id])
 }
 
 model ProductImage {
-  id           Int   @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   product_id   Int
   image_url    String
   is_thumbnail Boolean  @default(false)
   created_at   DateTime @default(now())
 
   product Product @relation(fields: [product_id], references: [id])
+
   @@index([product_id])
 }
+
 model Order {
   id              Int           @id @default(autoincrement())
   user_id         Int
   status          OrderStatus   @default(PENDING_PAYMENT)
   payment_status  PaymentStatus @default(UNPAID)
   subtotal_amount Decimal       @db.Decimal(12, 2)
-  shipping_amount Decimal       @db.Decimal(12, 2) @default(0.00)
+  shipping_amount Decimal       @default(0.00) @db.Decimal(12, 2)
   grand_total     Decimal       @db.Decimal(12, 2)
-  address_id      Int?
-  
   recipient_name  String        @db.VarChar(120)
   phone           String?       @db.VarChar(32)
   street          String        @db.VarChar(255)
   city            String        @db.VarChar(120)
   province        String        @db.VarChar(120)
   postal_code     String        @db.VarChar(16)
-  
-  courier_name    String?       @db.VarChar(100)  
-  courier_service String?       @db.VarChar(100)
-  tracking_number String?       @db.VarChar(100)
-  payment_link    String?       @db.VarChar(255)
-  external_id     String?       @db.VarChar(100)
-  
-  notes           String?       @db.VarChar(255)
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
 
-  user            User          @relation(fields: [user_id], references: [id])
-  address         Address?      @relation(fields: [address_id], references: [id])
-  items           OrderItem[]
+  courier_name    String? @db.VarChar(100)
+  courier_service String? @db.VarChar(100)
+  tracking_number String? @db.VarChar(100)
+  payment_link    String? @db.VarChar(255)
+  external_id     String? @db.VarChar(100)
+
+  notes      String?  @db.VarChar(255)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user  User        @relation(fields: [user_id], references: [id])
+  items OrderItem[]
 }
 
 model OrderItem {
-  id                Int           @id @default(autoincrement())
-  order_id          Int
-  product_id Int
-  name_snapshot     String        @db.VarChar(160)
-  size_snapshot     Size
-  unit_price        Decimal       @db.Decimal(12, 2)
-  qty               Int
-  line_total        Decimal       @db.Decimal(12, 2)
-  created_at        DateTime      @default(now())
+  id            Int      @id @default(autoincrement())
+  order_id      Int
+  product_id    Int?
+  name_snapshot String   @db.VarChar(160)
+  size_snapshot Size?
+  unit_price    Decimal  @db.Decimal(12, 2)
+  qty           Int
+  line_total    Decimal  @db.Decimal(12, 2)
+  created_at    DateTime @default(now())
 
-  order             Order         @relation(fields: [order_id], references: [id], onDelete: Cascade)
-  product           Product       @relation(fields: [product_id], references: [id])
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }
