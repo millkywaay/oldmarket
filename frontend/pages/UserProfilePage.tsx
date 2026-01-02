@@ -16,7 +16,7 @@ const UserProfilePage: React.FC = () => {
   const [addresses, setAddresses] = useState<any[]>([]);
 
   const fetchOrders = async () => {
-    if (!token) return;
+    if (!token || !user) return;
     try {
       const data = await orderService.getMyOrders(token);
       setOrders(data);
