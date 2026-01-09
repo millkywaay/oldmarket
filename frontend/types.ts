@@ -96,11 +96,13 @@ export interface Cart {
 }
 
 export enum OrderStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  SHIPPED = 'shipped',
-  DELIVERED = 'delivered',
-  CANCELLED = 'cancelled',
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
+  PAID = 'PAID', 
+  PROCESSING = 'PROCESSING',
+  DELIVERED = 'DELIVERED',
+  SHIPPED = 'SHIPPED',
+  COMPLETED = 'COMPLETED',
+  CANCELED = 'CANCELED',
 }
 
 export interface OrderItem {

@@ -2,6 +2,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    },
+  });
+}
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -86,3 +97,42 @@ export async function GET(
     );
   }
 }
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const orderId = Number(id);
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    if (order.status !== "SHIPPED") {
+      return NextResponse.json(
+        { error: "Pesanan belum dikirim" },
+        { status: 400 }
+      );
+    }
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: { status: "COMPLETED" },
+    });
+    return NextResponse.json(
+      {
+        message: "Pesanan berhasil dikonfirmasi",
+        order: updatedOrder,
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("ERROR:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+

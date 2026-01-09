@@ -29,3 +29,24 @@ export const getOrderById = async (
   if (!response.ok) throw new Error("Pesanan tidak ditemukan");
   return await response.json();
 };
+export async function markOrderCompleted(
+  token: string,
+  orderId: string
+) {
+  const res = await fetch(
+    `http://localhost:3000/api/orders/${orderId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Gagal menyelesaikan pesanan");
+  }
+
+  return res.json();
+}
+
