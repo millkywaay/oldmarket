@@ -25,8 +25,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
-    // 1️⃣ Ambil alamat (UNTUK SNAPSHOT)
     const address = await prisma.address.findUnique({
       where: { id: Number(addressId) },
     });
@@ -36,14 +34,10 @@ export async function POST(req: Request) {
         { status: 404 }
       );
     }
-
-    // 2️⃣ Ambil produk
     const productIds = cartItems.map((i: any) => Number(i.product_id));
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
     });
-
-    // 3️⃣ Validasi stok
     for (const item of cartItems) {
       const product = products.find(p => p.id === Number(item.product_id));
       if (!product) throw new Error("Produk tidak ditemukan");
@@ -52,7 +46,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // 4️⃣ Siapkan order items (SNAPSHOT)
     const orderItems = products.map(p => {
       const qty = cartItems.find((i:any) => Number(i.product_id) === p.id)?.qty ?? 1;
       return {
@@ -65,17 +58,13 @@ export async function POST(req: Request) {
       };
     });
 
-    // 5️⃣ Transaction singkat (AMAN)
     const result = await prisma.$transaction([
-      // kurangi stok
       ...cartItems.map((item:any) =>
         prisma.product.update({
           where: { id: Number(item.product_id) },
           data: { stock_quantity: { decrement: item.qty } },
         })
       ),
-
-      // create order
       prisma.order.create({
         data: {
           user_id: Number(userId),
@@ -85,8 +74,6 @@ export async function POST(req: Request) {
           subtotal_amount: subtotal,
           shipping_amount: shippingFee,
           grand_total: Number(subtotal) + Number(shippingFee),
-
-          // 🔥 SNAPSHOT ALAMAT
           recipient_name: address.recipient_name,
           phone: address.phone,
           street: address.street,
@@ -103,8 +90,6 @@ export async function POST(req: Request) {
           },
         },
       }),
-
-      // hapus cart item (kalau checkout dari cart)
       ...(orderType === "CART"
         ? [
             prisma.cartItem.deleteMany({
