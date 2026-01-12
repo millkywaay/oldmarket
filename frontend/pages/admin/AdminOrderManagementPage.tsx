@@ -1,143 +1,240 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Order, OrderStatus, PaginatedResponse } from '../../types';
+import { Order, OrderStatus, PaginatedResponse, User } from '../../types';
 import * as adminService from '../../services/adminService';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { DEFAULT_CURRENCY } from '../../constants';
-import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+
+interface OrderWithUser extends Order {
+  user?: {
+    name: string;
+    email: string;
+  };
+}
 
 const AdminOrderManagementPage: React.FC = () => {
   const { token } = useAuth();
-  const [ordersResponse, setOrdersResponse] = useState<PaginatedResponse<Order> | null>(null);
+  const [ordersResponse, setOrdersResponse] = useState<PaginatedResponse<OrderWithUser> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
   const [filterStatus, setFilterStatus] = useState<OrderStatus | ''>('');
+  const [filterDate, setFilterDate] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'COMPLETED':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'SHIPPED':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'PROCESSING':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'CANCELED':
+        return 'bg-red-100 text-red-700 border-red-200';
+      case 'PENDING_PAYMENT':
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-600';
+    }
+  };
+  const [isResiModalOpen, setIsResiModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [trackingNumber, setTrackingNumber] = useState('');
 
   const fetchOrders = useCallback(async () => {
     if (!token) return;
     setIsLoading(true);
-    setError(null);
     try {
       const response = await adminService.getAllAdminOrders(token, { 
         status: filterStatus || undefined,
+        date: filterDate || undefined,
         page: currentPage,
         limit: ordersPerPage
       });
-      setOrdersResponse(response);
+      if (Array.isArray(response)) {
+        setOrdersResponse({ items: response, total: response.length, page: 1, limit: 100 });
+      } else {
+        setOrdersResponse(response);
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to load orders.');
+      console.error("Fetch error:", err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [token, filterStatus, currentPage]);
+  }, [token, filterStatus, filterDate, currentPage]);
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
-    if (!token) return;
+const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+  if (newStatus === OrderStatus.SHIPPED) {
+    setSelectedOrderId(orderId);
+    setIsResiModalOpen(true);
+  } else {
     try {
-      await adminService.updateOrderStatus(token, orderId, newStatus);
+      await adminService.updateOrderStatus(token!, orderId, { status: newStatus });
       fetchOrders();
     } catch (err: any) {
-      setError(err.message || 'Failed to update order status.');
-    }
-  };
-  
-  const getStatusChipClass = (status: OrderStatus) => {
-    const baseClass = "text-xs font-medium px-2.5 py-1 rounded-full";
-    switch(status) {
-        case OrderStatus.DELIVERED: return `${baseClass} bg-green-100 text-green-800`;
-        case OrderStatus.SHIPPED: return `${baseClass} bg-blue-100 text-blue-800`;
-        case OrderStatus.PENDING: return `${baseClass} bg-yellow-100 text-yellow-800`;
-        case OrderStatus.PAID: return `${baseClass} bg-indigo-100 text-indigo-800`;
-        case OrderStatus.CANCELLED: return `${baseClass} bg-red-100 text-red-800`;
-        default: return `${baseClass} bg-gray-100 text-gray-800`;
+      alert(err.message);
     }
   }
+};
 
-  const totalPages = ordersResponse ? Math.ceil(ordersResponse.total / ordersPerPage) : 1;
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage);
+  const submitResi = async () => {
+    if (!trackingNumber || !selectedOrderId) {
+      alert("Nomor resi harus diisi!");
+      return;
+    }
+    try {
+      await adminService.updateOrderStatus(token!, selectedOrderId, { 
+        status: OrderStatus.SHIPPED, 
+        tracking_number: trackingNumber 
+      });
+      setIsResiModalOpen(false);
+      setTrackingNumber('');
+      fetchOrders();
+      alert("Pesanan berhasil dikirim dengan nomor resi.");
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
-  const orders = ordersResponse?.items || [];
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Laporan Order Oldmarketjkt", 14, 15);
+    const tableData = ordersResponse?.items.map(o => [
+      `#${o.id}`,
+      o.user?.name || `User ID: ${o.user_id}`,
+      format(new Date(o.created_at), 'dd/MM/yyyy'),
+      `Rp ${Number(o.total_amount).toLocaleString()}`,
+      o.order_status
+    ]) || [];
+
+    autoTable(doc, {
+      startY: 20,
+      head: [['ID', 'Customer', 'Tanggal', 'Total', 'Status']],
+      body: tableData,
+    });
+    doc.save(`Order_Report_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+  };
 
   return (
-    <div className="space-y-6 p-4 md:p-6 bg-gray-100 min-h-full">
-      <h1 className="text-3xl font-bold text-gray-800">Order Management</h1>
-
-      {error && <p className="text-red-500 bg-red-100 p-3 rounded-md">{error}</p>}
-
-      <div className="p-4 bg-white rounded-lg shadow-sm flex items-center gap-4">
-        <label htmlFor="status-filter" className="font-medium text-sm">Filter by Status:</label>
-        <select
-          id="status-filter"
-          value={filterStatus}
-          onChange={(e) => {setFilterStatus(e.target.value as OrderStatus | ''); setCurrentPage(1);}}
-          className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-black focus:border-black"
-        >
-          <option value="">All Statuses</option>
-          {Object.values(OrderStatus).map(status => (
-            <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-          ))}
-        </select>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Manajemen Pesanan</h1>
+          <p className="text-gray-500">Pantau dan kelola status pengiriman pelanggan.</p>
+        </div>
+        <Button onClick={exportPDF} className="bg-blue-600 hover:bg-blue-700 text-white flex gap-2 items-center">
+          <span>Export PDF</span>
+        </Button>
       </div>
 
-      {isLoading ? <LoadingSpinner message="Fetching orders..." /> :
-       !isLoading && orders.length === 0 ? <p className="text-gray-600 text-center py-10">No orders found matching your criteria.</p> : (
-        <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Update Status</th>
+      {/* Filter Section */}
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex flex-wrap gap-4">
+        <select 
+          value={filterStatus} 
+          onChange={(e) => setFilterStatus(e.target.value as OrderStatus)}
+          className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Semua Status</option>
+          {Object.values(OrderStatus).map(status => (
+            <option key={status} value={status}>{status}</option>
+          ))}
+        </select>
+        <input 
+          type="date" 
+          value={filterDate}
+          onChange={(e) => setFilterDate(e.target.value)}
+          className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-20"><LoadingSpinner /></div>
+      ) : (
+       <div className="bg-white rounded-lg shadow overflow-x-auto border border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Aksi</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {ordersResponse?.items.map((order) => (
+              <tr key={order.id} className="hover:bg-gray-50">
+                <td className="px-4 py-4 text-sm font-medium whitespace-nowrap">#{order.id}</td>
+                <td className="px-4 py-4 text-sm whitespace-nowrap">{order.user?.name || 'User'}</td>
+                <td className="px-4 py-4 text-sm whitespace-nowrap">
+                  {format(new Date(order.created_at), 'dd/MM/yy')}
+                </td>
+                <td className="px-4 py-4 text-sm font-bold whitespace-nowrap text-blue-600">
+                  Rp {order.total_amount.toLocaleString()}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold border uppercase ${getStatusStyle(order.order_status)}`}>
+                    {order.order_status}
+                  </span>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <select 
+                    value={order.order_status}
+                    onChange={(e) => handleStatusUpdate(order.id, e.target.value as OrderStatus)}
+                    className="border text-xs p-1 rounded bg-white outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    {Object.values(OrderStatus).map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {orders.map(order => (
-                <tr key={order.id} className="hover:bg-gray-50 transition-colors duration-150">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <Link to={`/order-confirmation/${order.id}`} className="hover:underline">#{order.id}</Link>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.user_id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(order.created_at).toLocaleDateString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{DEFAULT_CURRENCY} {order.total_amount.toLocaleString('id-ID')}</td>
-                  <td className="px-6 py-4 whitespace-nowrap"><span className={getStatusChipClass(order.order_status)}>{order.order_status.toUpperCase()}</span></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                     <select
-                        name={`status-${order.id}`}
-                        value={order.order_status}
-                        onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
-                        className="text-xs p-1.5 rounded-md border-gray-300 focus:ring-black focus:border-black"
-                        aria-label={`Update status for order ${order.id}`}
-                      >
-                        {Object.values(OrderStatus).map(status => (
-                          <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-                        ))}
-                      </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
       )}
-      
-      {ordersResponse && ordersResponse.total > ordersPerPage && !isLoading && (
-        <div className="mt-8 flex justify-center items-center gap-2">
-            <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} variant="outline" size="md" className="!rounded-md">Previous</Button>
-            <span className="text-sm text-gray-600">Page {currentPage} of {totalPages}</span>
-            <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} variant="outline" size="md" className="!rounded-md">Next</Button>
+
+      {/* Pagination */}
+      <div className="mt-6 flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
+        <p className="text-sm text-gray-600">Total: {ordersResponse?.total || 0} Orders</p>
+        <div className="flex gap-2">
+          <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} variant="outline">Prev</Button>
+          <span className="px-4 py-2 bg-gray-100 rounded text-sm font-bold">{currentPage}</span>
+          <Button onClick={() => setCurrentPage(p => p + 1)} disabled={!ordersResponse?.items.length || ordersResponse.items.length < ordersPerPage} variant="outline">Next</Button>
+        </div>
+      </div>
+
+      {/* Modal Input Resi */}
+      {isResiModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Input Nomor Resi</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Masukkan nomor resi pengiriman untuk Order <strong>#{selectedOrderId}</strong> agar status berubah ke SHIPPED.
+            </p>
+            <input
+              type="text"
+              className="w-full border-2 border-gray-200 rounded-lg p-3 mb-6 focus:border-blue-500 outline-none transition-all"
+              placeholder="Contoh: JNE123456789"
+              value={trackingNumber}
+              onChange={(e) => setTrackingNumber(e.target.value)}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3">
+              <Button onClick={() => { setIsResiModalOpen(false); setTrackingNumber(''); }} variant="outline">Batal</Button>
+              <Button onClick={submitResi} className="bg-blue-600 text-white px-6 hover:bg-blue-700">Kirim Barang</Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

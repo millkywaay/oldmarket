@@ -41,19 +41,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("authToken")
   );
-  const [isLoading, setIsLoading] = useState<boolean>(
-    !localStorage.getItem("authToken")
-  );
+  const [isLoading, setIsLoading] = useState<boolean>(!!localStorage.getItem("authToken"));
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userData");
-    navigate("/");
-  };
+const logout = useCallback(() => { 
+  setUser(null);
+  setToken(null);
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("userData");
+  navigate("/login"); 
+}, [navigate]);
 
   const checkAuth = useCallback(async () => {
     if (DEV_AUTH) {
@@ -83,11 +81,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
   }, [logout]);
 
-  useEffect(() => {
-  if (token && !DEV_AUTH) {
+useEffect(() => {
+  const token = localStorage.getItem("authToken");
+  if (token) {
     checkAuth();
+  } else {
+    setIsLoading(false); 
   }
-}, []);
+}, [checkAuth]);
 
   const login = async (credentials: authService.LoginCredentials) => {
     setIsLoading(true);

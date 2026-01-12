@@ -52,3 +52,39 @@ export const getAdminBrands = async (): Promise<Brand[]> => {
   const data = await response.json();
   return data.brands || data; 
 };
+export const getAllAdminOrders = async (token: string, params: any) => {
+  const query = new URLSearchParams();
+  if (params.status) query.append("status", params.status);
+  if (params.date) query.append("date", params.date);
+
+  const response = await fetch(`${BASE_URL}/admin/orders?${query.toString()}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
+    },
+  });
+
+  if (!response.ok) throw new Error("Gagal mengambil data admin");
+  
+  // Kembalikan seluruh objek { success: true, items: [...] }
+  return await response.json(); 
+};
+
+export const updateOrderStatus = async (
+  token: string, 
+  orderId: string | number, 
+  payload: { status: string, tracking_number?: string }
+) => {
+  const response = await fetch(`${BASE_URL}/admin/orders/${orderId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) throw new Error("Gagal update status");
+  return await response.json();
+};
