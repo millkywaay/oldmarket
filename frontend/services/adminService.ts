@@ -1,6 +1,6 @@
 import { Brand } from '../types';
 
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = "https://oldmarket.vercel.app/api";
 
 export const addProduct = async (token: string, productData: any): Promise<any> => {
   console.log('Admin: Sending product to Backend...', productData);

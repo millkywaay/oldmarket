@@ -33,7 +33,7 @@ const OrderConfirmationPage: React.FC = () => {
     if (!order) return;
 
     try {
-      const res = await fetch("http://localhost:3000/api/payment", {
+      const res = await fetch("https://oldmarket.vercel.app/api/payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

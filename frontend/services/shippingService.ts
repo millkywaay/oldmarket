@@ -5,7 +5,7 @@ export const getShippingCost = async (
   weightKg: number
 ) => {
   const res = await axios.get(
-    "http://localhost:3000/api/shipping",
+    "https://oldmarket.vercel.app/api/shipping",
     {
       params: {
         destination: destinationVillageCode,

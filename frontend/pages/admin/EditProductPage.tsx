@@ -17,7 +17,7 @@ export default function EditProductPage() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/products/${id}`);
+        const res = await fetch(`https://oldmarket.vercel.app/api/products/${id}`);
         const productData = await res.json();
         const brandsData = await productService.getBrands();
 

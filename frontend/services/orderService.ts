@@ -1,6 +1,6 @@
 import { Order } from "../types";
 
-const BASE = "http://localhost:3000/api/orders";
+const BASE = "https://oldmarket.vercel.app/api/orders";
 export interface CheckoutData {
   shipping_address: string;
   payment_method: string;
@@ -34,7 +34,7 @@ export async function markOrderCompleted(
   orderId: string
 ) {
   const res = await fetch(
-    `http://localhost:3000/api/orders/${orderId}`,
+    `https://oldmarket.vercel.app/api/orders/${orderId}`,
     {
       method: "PATCH",
       headers: {

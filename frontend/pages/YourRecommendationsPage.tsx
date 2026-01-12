@@ -23,7 +23,7 @@ const YourRecommendationsPage: React.FC = () => {
         setIsLoading(true);
         setError(null);
 
-        const res = await fetch("http://localhost:3000/api/recommendations", {
+        const res = await fetch("https://oldmarket.vercel.app/api/recommendations", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
