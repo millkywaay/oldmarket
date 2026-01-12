@@ -101,3 +101,15 @@ export const getSalesReports = async (token: string, params: { dateFrom?: string
   }
   return response.json();
 };
+export const getDashboardSummary = async (token: string, range: string = 'month') => {
+  const response = await fetch(`${BASE_URL}/admin/dashboard?range=${range}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
+    },
+  });
+
+  if (!response.ok) throw new Error("Gagal mengambil ringkasan dashboard");
+  return await response.json();
+};

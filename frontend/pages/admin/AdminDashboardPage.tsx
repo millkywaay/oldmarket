@@ -1,99 +1,233 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { AdminDashboardSummary, SalesDataPoint } from '../../types';
-import * as adminService from '../../services/adminService';
-import { useAuth } from '../../contexts/AuthContext';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import SalesChart from '../../components/admin/SalesChart';
-import { DollarSign, ShoppingCart, Archive, AlertTriangle } from 'lucide-react';
-
-const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; linkTo?: string; colorClass: string }> = 
-  ({ title, value, icon, linkTo, colorClass }) => (
-  <div className={`p-6 rounded-xl shadow-md bg-white border-l-4 ${colorClass} transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}>
-    <div className="flex items-center justify-between mb-2">
-      <h3 className="text-md font-semibold text-gray-600">{title}</h3>
-      <div className="text-gray-400">{icon}</div>
-    </div>
-    <p className="text-3xl font-bold text-gray-800">{value}</p>
-    {linkTo && <Link to={linkTo} className="text-sm text-blue-600 hover:underline mt-2 inline-block">View All &rarr;</Link>}
-  </div>
-);
-
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import * as adminService from "../../services/adminService";
+import { useAuth } from "../../contexts/AuthContext";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import {
+  DollarSign,
+  ShoppingCart,
+  Package,
+  AlertTriangle,
+  Clock,
+  Award,
+  ChevronRight,
+  User,
+} from "lucide-react";
 
 const AdminDashboardPage: React.FC = () => {
   const { token } = useAuth();
-  const [summary, setSummary] = useState<AdminDashboardSummary | null>(null);
-  const [salesData, setSalesData] = useState<SalesDataPoint[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState("month");
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!token) { setIsLoading(false); return; }
-      setIsLoading(true);
-      setError(null);
+    const fetchDashboard = async () => {
+      setLoading(true);
       try {
-        const [summaryData, reportData] = await Promise.all([
-          adminService.getAdminDashboardSummary(token),
-          adminService.getSalesReports(token),
-        ]);
-        setSummary(summaryData);
-        setSalesData(reportData);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load dashboard data.');
+        const res = await adminService.getDashboardSummary(token!, timeRange);
+        setData(res);
+      } catch (err) {
+        console.error("Dashboard Error:", err);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-    fetchData();
-  }, [token]);
+    if (token) fetchDashboard();
+  }, [token, timeRange]);
 
-  if (isLoading) return <div className="min-h-[60vh] flex items-center justify-center"><LoadingSpinner message="Loading admin dashboard..." /></div>;
-  if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
-  if (!summary) return <div className="text-center text-gray-600 py-10">No summary data available.</div>;
+  if (loading || !data) return <LoadingSpinner />;
 
   return (
-    <div className="space-y-8 p-4 md:p-6 bg-gray-100 min-h-full">
-      <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-
-      {/* Key Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Revenue" value={`Rp ${summary.totalRevenue.toLocaleString('id-ID')}`} icon={<DollarSign/>} colorClass="border-green-500" linkTo="/admin/reports" />
-        <StatCard title="Total Orders" value={summary.totalOrders} icon={<ShoppingCart/>} colorClass="border-blue-500" linkTo="/admin/orders" />
-        <StatCard title="Total Products" value={summary.totalProducts} icon={<Archive/>} colorClass="border-purple-500" linkTo="/admin/products" />
-        <StatCard title="Low Stock Items" value={summary.lowStockItemsCount} icon={<AlertTriangle/>} colorClass="border-red-500" linkTo="/admin/products?filter=lowstock" />
+    <div className="p-6 bg-[#F8F9FB] min-h-screen space-y-8">
+      {/* Header & Filter */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-extrabold text-[#1A1C21]">
+          Dashboard Overview
+        </h1>
+        <select
+          value={timeRange}
+          onChange={(e) => setTimeRange(e.target.value)}
+          className="bg-white border border-gray-200 text-sm font-semibold rounded-lg px-4 py-2 shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="day">Hari Ini</option>
+          <option value="week">7 Hari Terakhir</option>
+          <option value="month">30 Hari Terakhir</option>
+          <option value="year">Tahun Ini</option>
+        </select>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        <div className="lg:col-span-3">
-            <SalesChart data={salesData} title="Monthly Sales Trend" type="line"/>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        {/* Revenue Card dibuat col-span-2 agar angka besar muat */}
+        <div className="lg:col-span-2">
+          <StatCard
+            title="Revenue"
+            value={`Rp ${data.totalRevenue.toLocaleString("id-ID")}`}
+            icon={<DollarSign size={28} />}
+            color="text-emerald-600"
+            bg="bg-emerald-50"
+          />
         </div>
-        
-        <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-xl font-semibold text-gray-700 mb-4">Best Selling Products</h3>
-                {summary.bestSellingProducts.length > 0 ? (
-                <ul className="space-y-3">
-                    {summary.bestSellingProducts.slice(0,5).map(p => (
-                    <li key={p.product_id} className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded">
-                        <Link to={`/product/${p.product_id}`} className="text-gray-800 hover:text-blue-600 truncate" title={p.name}>{p.name}</Link>
-                        <span className="font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">{p.total_sold} sold</span>
-                    </li>
-                    ))}
-                </ul>
-                ) : <p className="text-gray-500">No sales data for best sellers yet.</p>}
-            </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-xl font-semibold text-gray-700 mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Link to="/admin/products" className="block p-4 text-center text-white rounded-lg hover:bg-gray-800 transition">Manage Products</Link>
-                    <Link to="/admin/orders" className="block p-4 text-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Manage Orders</Link>
+        <StatCard
+          title="Orders"
+          value={data.totalOrders}
+          icon={<ShoppingCart size={24} />}
+          color="text-blue-600"
+          bg="bg-blue-50"
+        />
+        <StatCard
+          title="Products"
+          value={data.totalProducts}
+          icon={<Package size={24} />}
+          color="text-violet-600"
+          bg="bg-violet-50"
+        />
+        <StatCard
+          title="Low Stock"
+          value={data.lowStockCount}
+          icon={<AlertTriangle size={24} />}
+          color={data.lowStockCount > 0 ? "text-red-600" : "text-gray-400"}
+          bg={data.lowStockCount > 0 ? "bg-red-50" : "bg-gray-100"}
+          isAlert={data.lowStockCount > 0}
+          linkTo="/admin/products"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-50 flex justify-between items-center">
+            <h3 className="font-bold text-gray-800 flex items-center gap-2">
+              <Clock size={18} className="text-blue-500" /> Recent Orders
+            </h3>
+            <Link
+              to="/admin/orders"
+              className="text-sm text-blue-600 font-semibold hover:underline"
+            >
+              View All
+            </Link>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[600px]">
+              {/* min-w-[600px] memastikan tabel tetap memiliki lebar minimum saat layar mengecil */}
+              <thead className="bg-gray-50/50 text-gray-400 font-medium">
+                <tr>
+                  <th className="px-6 py-4 text-left">Customer</th>
+                  <th className="px-6 py-4 text-left">Date</th>
+                  <th className="px-6 py-4 text-right">Amount</th>
+                  <th className="px-6 py-4 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {data.recentOrders?.map((order: any) => (
+                  <tr
+                    key={order.id}
+                    className="hover:bg-gray-50/50 transition-colors"
+                  >
+                    <td className="px-6 py-4 font-semibold text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                        <User size={14} />
+                      </div>
+                      {order.customer}
+                    </td>
+                    <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
+                      {new Date(order.date).toLocaleDateString("id-ID")}
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-gray-800 whitespace-nowrap">
+                      Rp {order.amount.toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-6 py-4 text-center whitespace-nowrap">
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
+                          order.status === "COMPLETED"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-orange-100 text-orange-700"
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <Award size={18} className="text-orange-500" /> Best Sellers
+          </h3>
+          <div className="space-y-6">
+            {data.bestSellingProducts?.map((product: any, i: number) => (
+              <div key={i} className="flex items-center gap-4 group">
+                <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden border border-gray-50 flex-shrink-0">
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                      <Package size={20} />
+                    </div>
+                  )}
                 </div>
-            </div>
+                <div className="flex-grow min-w-0">
+                  <h4 className="text-sm font-bold text-gray-800 truncate">
+                    {product.name}
+                  </h4>
+                  <p className="text-xs text-gray-400 font-medium">
+                    {product.total_sold} terjual
+                  </p>
+                </div>
+                <ChevronRight
+                  size={16}
+                  className="text-gray-300 group-hover:text-blue-500 transition-colors"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+const StatCard = ({ title, value, icon, color, bg, isAlert, linkTo }: any) => (
+  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden h-full transition-transform hover:-translate-y-1">
+    {isAlert && (
+      <div className="absolute top-4 right-4">
+        <span className="relative flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+        </span>
+      </div>
+    )}
+
+    <div className="flex items-center gap-5">
+      <div className={`p-4 rounded-2xl ${bg} ${color}`}>{icon}</div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-gray-400 truncate">{title}</p>
+        <h3
+          className={`text-2xl font-black truncate ${
+            isAlert ? "text-red-600" : "text-gray-800"
+          }`}
+        >
+          {value}
+        </h3>
+        {linkTo && (
+          <Link
+            to={linkTo}
+            className="text-[10px] font-bold uppercase mt-1 block text-blue-500 hover:underline"
+          >
+            Manage &rarr;
+          </Link>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
 export default AdminDashboardPage;
