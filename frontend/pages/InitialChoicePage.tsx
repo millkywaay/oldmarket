@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';;
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button';
 import { LOGO_TEXT } from '../constants';

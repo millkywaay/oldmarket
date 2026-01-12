@@ -23,8 +23,20 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
+    /* Type Resolution */
+    "types": ["react", "react-dom"],
+    "typeRoots": ["./node_modules/@types", "./types"],
+
     "paths": {
-      "@/*" :  ["./*"]
+      "@/*" : ["./*"]
     }
-  }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.d.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
 }

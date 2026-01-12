@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
 import { Brand, Size } from "../../types";
 import Button from "../common/Button";
 import FormField from "../common/FormField";

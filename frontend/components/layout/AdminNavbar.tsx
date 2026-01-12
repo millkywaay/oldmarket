@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from 'react';
 import { User, Menu } from "lucide-react";
 
 interface AdminNavbarProps {

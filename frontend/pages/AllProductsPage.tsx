@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import * as React from "react";
+import { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Product, Brand, Size } from '../types';
 import * as productService from '../services/productService';

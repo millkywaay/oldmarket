@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';;
 import { Address } from '../../types';
 import { Home, Briefcase, X } from 'lucide-react';
 

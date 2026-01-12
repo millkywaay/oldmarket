@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import * as React from "react";
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import * as adminService from '../../services/adminService';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';

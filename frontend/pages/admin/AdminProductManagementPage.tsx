@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import * as React from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Product, Brand } from "../../types";
 import * as productService from "../../services/productService";

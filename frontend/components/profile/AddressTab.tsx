@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import * as React from "react";
+import  { useEffect, useState } from 'react';
 import { Trash2, Plus, Home, Briefcase, Edit2 } from 'lucide-react';
 import Button from '../common/Button';
 import FormField from '../common/FormField';

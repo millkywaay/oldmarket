@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import * as React from "react";
+import { useEffect, useState } from 'react';
 import { Product } from '../types';
 import * as productService from '../services/productService';
 import ProductCard from '../components/common/ProductCard';

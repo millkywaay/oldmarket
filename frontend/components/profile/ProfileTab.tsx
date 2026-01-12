@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
+import  { useState, useEffect } from "react";
 import FormField from "../common/FormField";
 import Button from "../common/Button";
 import * as userService from "../../services/userService";

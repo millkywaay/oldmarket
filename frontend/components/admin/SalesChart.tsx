@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';;
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { SalesDataPoint } from '../../types';
 
