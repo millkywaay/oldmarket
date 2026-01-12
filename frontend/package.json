@@ -1,11 +1,11 @@
 {
-  "name": "jerco---e-commerce-ui-demo",
+  "name": "oldmarket-jkt",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "chmod +x node_modules/.bin/vite && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -32,5 +32,5 @@
   },
   "engines": {
   "node": "20.x"
-}
+  }
 }
