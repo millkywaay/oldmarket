@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Order, OrderStatus, PaginatedResponse, User } from '../../types';
+import { Order, OrderStatus, PaginatedResponse } from '../../types';
 import * as adminService from '../../services/adminService';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';

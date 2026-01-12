@@ -66,8 +66,6 @@ export const getAllAdminOrders = async (token: string, params: any) => {
   });
 
   if (!response.ok) throw new Error("Gagal mengambil data admin");
-  
-  // Kembalikan seluruh objek { success: true, items: [...] }
   return await response.json(); 
 };
 
@@ -87,4 +85,19 @@ export const updateOrderStatus = async (
 
   if (!response.ok) throw new Error("Gagal update status");
   return await response.json();
+};
+export const getSalesReports = async (token: string, params: { dateFrom?: string; dateTo?: string }) => {
+  const query = new URLSearchParams(params as any).toString();
+  const response = await fetch(`${BASE_URL}/admin/sales?${query}`, { 
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Gagal mengambil laporan");
+  }
+  return response.json();
 };
