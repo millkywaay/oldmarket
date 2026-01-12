@@ -130,7 +130,7 @@ const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
           <h1 className="text-3xl font-bold text-gray-800">Manajemen Pesanan</h1>
           <p className="text-gray-500">Pantau dan kelola status pengiriman pelanggan.</p>
         </div>
-        <Button onClick={exportPDF} className="bg-blue-600 hover:bg-blue-700 text-white flex gap-2 items-center">
+        <Button onClick={exportPDF} className="bg-blue-600 hover:bg-back-700 text-white flex gap-2 items-center">
           <span>Export PDF</span>
         </Button>
       </div>

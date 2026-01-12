@@ -70,7 +70,7 @@ const AdminSalesReportsPage: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 p-4 md:p-8 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Sales Reports</h1>
-        <Button onClick={handleExportPDF} className="bg-red-600 text-white flex gap-2">
+        <Button onClick={handleExportPDF} className="bg-blue-600 text-white flex gap-2">
           <Download size={18} /> PDF
         </Button>
       </div>
