@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://oldmarket.vercel.app",
+  "Access-Control-Allow-Origin": "https://oldmarketjkt.vercel.app",
   "Access-Control-Allow-Methods": "PATCH, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
