@@ -48,3 +48,7 @@ desktop.ini
 *.zip
 *.rar
 *.tar.gz
+
+**/node_modules/
+**/package-lock.json
+**/yarn.lock
