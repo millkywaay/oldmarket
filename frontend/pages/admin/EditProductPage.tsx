@@ -6,6 +6,7 @@ import * as adminService from "../../services/adminService";
 import { useAuth } from "../../contexts/AuthContext";
 import { Brand } from "../../types";
 
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
 export default function EditProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function EditProductPage() {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const res = await fetch(`https://oldmarket.vercel.app/api/products/${id}`);
+        const res = await fetch(`${baseUrl}/api/products/${id}`);
         const productData = await res.json();
         const brandsData = await productService.getBrands();
 

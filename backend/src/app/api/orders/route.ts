@@ -101,10 +101,10 @@ export async function POST(req: Request) {
           ]
         : []),
     ]);
-
+    const createdOrder = result.find(item => item && typeof item === 'object' && 'grand_total' in item);
     return NextResponse.json({
       success: true,
-      data: result[result.length - 1],
+      data: createdOrder,
     });
 
   } catch (err: any) {

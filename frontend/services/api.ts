@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
 const api = axios.create({
-  baseURL: 'https://oldmarket.vercel.app/api', 
+  baseURL: `${baseUrl}/api`, 
 });
 
 api.interceptors.request.use((config) => {

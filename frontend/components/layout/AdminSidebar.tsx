@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Link, useLocation, useNavigate } from "react-router-dom"; // Tambahkan useNavigate
-import { useAuth } from "../../contexts/AuthContext"; // Import useAuth
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   LayoutDashboard,
   Package,
@@ -22,7 +22,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth(); // Ambil fungsi logout dari context
+  const { logout } = useAuth(); 
 
   const menuItems = [
     { path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },

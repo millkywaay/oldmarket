@@ -1,13 +1,14 @@
 import { Order } from "../types";
 
-const BASE = "https://oldmarket.vercel.app/api/orders";
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
+
 export interface CheckoutData {
   shipping_address: string;
   payment_method: string;
 }
 
 export async function getMyOrders(token: string): Promise<Order[]> {
-  const res = await fetch(`${BASE}/my`, {
+  const res = await fetch(`${baseUrl}/api/orders/my`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -23,7 +24,7 @@ export const getOrderById = async (
   token: string,
   orderId: string
 ): Promise<Order> => {
-  const response = await fetch(`${BASE}/${orderId}`, {
+  const response = await fetch(`${baseUrl}/api/orders/${orderId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!response.ok) throw new Error("Pesanan tidak ditemukan");
@@ -34,7 +35,7 @@ export async function markOrderCompleted(
   orderId: string
 ) {
   const res = await fetch(
-    `https://oldmarket.vercel.app/api/orders/${orderId}`,
+    `${baseUrl}/api/orders/${orderId}`,
     {
       method: "PATCH",
       headers: {

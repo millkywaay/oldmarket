@@ -9,6 +9,7 @@ import Button from "../components/common/Button";
 import { DEFAULT_CURRENCY } from "../constants";
 import { CheckCircle2, ShoppingBag } from "lucide-react";
 
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
 const OrderConfirmationPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const { token, user } = useAuth();
@@ -34,7 +35,7 @@ const OrderConfirmationPage: React.FC = () => {
     if (!order) return;
 
     try {
-      const res = await fetch("https://oldmarket.vercel.app/api/payment", {
+      const res = await fetch(`${baseUrl}/api/payment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

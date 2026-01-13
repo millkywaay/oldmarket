@@ -2,8 +2,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const allowedOrigin = process.env.URL_FRONTEND || "";
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://oldmarketjkt.vercel.app",
+  "Access-Control-Allow-Origin": allowedOrigin,
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
@@ -49,7 +50,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: true, items: formatted }, { 
       status: 200, 
       headers: {
-        "Access-Control-Allow-Origin": "https://oldmarketjkt.vercel.app",
+        "Access-Control-Allow-Origin": allowedOrigin,
         "Access-Control-Allow-Methods": "GET, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
       } 

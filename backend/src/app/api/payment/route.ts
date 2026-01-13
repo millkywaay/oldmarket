@@ -2,8 +2,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-const midtransClient = require('midtrans-client');
 
+const midtransClient = require('midtrans-client');
 const snap = new midtransClient.Snap({
   isProduction: false,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         phone: order.phone
       },
       callbacks: {
-        finish: "https://oldmarket.vercel.app/profile" 
+        finish: `${process.env.URL_FRONTEND}/profile` 
       }
     };
 

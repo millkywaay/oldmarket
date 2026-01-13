@@ -1,11 +1,10 @@
 import { Brand } from '../types';
 
-const BASE_URL = "https://oldmarket.vercel.app/api";
-
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
 export const addProduct = async (token: string, productData: any): Promise<any> => {
   console.log('Admin: Sending product to Backend...', productData);
   
-  const response = await fetch(`${BASE_URL}/products`, {
+  const response = await fetch(`${baseUrl}/api/products`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -22,7 +21,7 @@ export const addProduct = async (token: string, productData: any): Promise<any> 
 };
 
 export const editProduct = async (token: string, productId: string, productData: any): Promise<any> => {
-  const response = await fetch(`${BASE_URL}/products/${productId}`, {
+  const response = await fetch(`${baseUrl}/api/products/${productId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -37,7 +36,7 @@ export const editProduct = async (token: string, productId: string, productData:
 };
 
 export const deleteProduct = async (token: string, productId: string): Promise<void> => {
-  const response = await fetch(`${BASE_URL}/products/${productId}`, {
+  const response = await fetch(`${baseUrl}/api/products/${productId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`
@@ -48,7 +47,7 @@ export const deleteProduct = async (token: string, productId: string): Promise<v
 };
 
 export const getAdminBrands = async (): Promise<Brand[]> => {
-  const response = await fetch(`${BASE_URL}/brands`);
+  const response = await fetch(`${baseUrl}/api/brands`);
   const data = await response.json();
   return data.brands || data; 
 };
@@ -57,7 +56,7 @@ export const getAllAdminOrders = async (token: string, params: any) => {
   if (params.status) query.append("status", params.status);
   if (params.date) query.append("date", params.date);
 
-  const response = await fetch(`${BASE_URL}/admin/orders?${query.toString()}`, {
+  const response = await fetch(`${baseUrl}/api/admin/orders?${query.toString()}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -74,7 +73,7 @@ export const updateOrderStatus = async (
   orderId: string | number, 
   payload: { status: string, tracking_number?: string }
 ) => {
-  const response = await fetch(`${BASE_URL}/admin/orders/${orderId}`, {
+  const response = await fetch(`${baseUrl}/api/admin/orders/${orderId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -88,7 +87,7 @@ export const updateOrderStatus = async (
 };
 export const getSalesReports = async (token: string, params: { dateFrom?: string; dateTo?: string }) => {
   const query = new URLSearchParams(params as any).toString();
-  const response = await fetch(`${BASE_URL}/admin/sales?${query}`, { 
+  const response = await fetch(`${baseUrl}/api/admin/sales?${query}`, { 
     headers: { 
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/json'
@@ -102,7 +101,7 @@ export const getSalesReports = async (token: string, params: { dateFrom?: string
   return response.json();
 };
 export const getDashboardSummary = async (token: string, range: string = 'month') => {
-  const response = await fetch(`${BASE_URL}/admin/dashboard?range=${range}`, {
+  const response = await fetch(`${baseUrl}/api/admin/dashboard?range=${range}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,

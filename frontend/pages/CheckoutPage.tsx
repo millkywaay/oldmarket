@@ -11,6 +11,7 @@ import AddressModal from "../components/checkout/AddressModal";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth()
@@ -108,27 +109,24 @@ const handlePlaceOrder = async () => {
         courierName: selectedCourier.courier_name,
         courierService: selectedCourier.courier_code
       };
-
-      const response = await fetch('https://oldmarket.vercel.app/api/orders', {
+      const response = await fetch(`${baseUrl}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
       });
-
-      const text = await response.text();
-      let result;
-      try {
-        result = JSON.parse(text);
-      } catch (e) {
-        throw new Error("Respon server bukan JSON yang valid.");
-      }
-
+      const result = await response.json()
       if (!response.ok) throw new Error(result.error || "Gagal membuat pesanan");
-      await fetchCart(); 
-      alert("Pesanan berhasil dibuat!");
-      navigate(`/order-confirmation/${result.data.id}`);
-      
-    } catch (err: any) {
+      const newOrderId = result.data?.id || result.id;
+
+      if (newOrderId) {
+        await fetchCart(); 
+        alert("Pesanan berhasil dibuat!");
+        navigate(`/order-confirmation/${newOrderId}`);
+      } else {
+        console.error("Struktur Respon Server:", result);
+        throw new Error("Gagal mendapatkan ID pesanan baru dari server.");
+      }
+      } catch (err: any) {
       alert("Error: " + err.message);
     } finally {
       setIsLoading(false);

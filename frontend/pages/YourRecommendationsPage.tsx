@@ -6,6 +6,7 @@ import ProductCard from "../components/common/ProductCard";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { useAuth } from "../contexts/AuthContext";
 
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
 const YourRecommendationsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +25,7 @@ const YourRecommendationsPage: React.FC = () => {
         setIsLoading(true);
         setError(null);
 
-        const res = await fetch("https://oldmarket.vercel.app/api/recommendations", {
+        const res = await fetch(`${baseUrl}/api/recommendations`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

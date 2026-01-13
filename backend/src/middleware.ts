@@ -3,10 +3,11 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
+  const allowedOrigin = process.env.URL_FRONTEND || "";
 
   response.headers.set(
     "Access-Control-Allow-Origin",
-    "https://oldmarketjkt.vercel.app"
+    allowedOrigin
   );
   response.headers.set(
     "Access-Control-Allow-Methods",

@@ -1,4 +1,5 @@
-const BACKEND_URL = "https://oldmarket.vercel.app";
+
+const baseUrl = import.meta.env.VITE_URL_BACKEND;
 
 export interface LoginCredentials {
   identifier: string;
@@ -23,7 +24,7 @@ export interface LoginResponse {
 }
 
 export async function login({ identifier, password }: LoginCredentials): Promise<LoginResponse> {
-  const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+  const res = await fetch(`${baseUrl}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: identifier, password }),
@@ -36,7 +37,7 @@ export async function login({ identifier, password }: LoginCredentials): Promise
 }
 
 export async function register({ username, email, password }: RegisterData) {
-  const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
+  const res = await fetch(`${baseUrl}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name: username, email, password }),
@@ -48,7 +49,7 @@ export async function register({ username, email, password }: RegisterData) {
 }
 
 export async function getMe(token: string) {
-  const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
+  const res = await fetch(`${baseUrl}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
