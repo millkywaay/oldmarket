@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         phone: order.phone
       },
       callbacks: {
-        finish: "http://localhost:5173/profile" 
+        finish: "https://oldmarket.vercel.app/profile" 
       }
     };
 

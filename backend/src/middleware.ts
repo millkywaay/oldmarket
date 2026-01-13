@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
 
   response.headers.set(
     "Access-Control-Allow-Origin",
-    "http://localhost:5173"
+    "https://oldmarket.vercel.app"
   );
   response.headers.set(
     "Access-Control-Allow-Methods",
