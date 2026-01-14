@@ -10,6 +10,7 @@ import * as shippingService from "../services/shippingService";
 import AddressModal from "../components/checkout/AddressModal";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { swalService } from "../services/swalService";
 
 const baseUrl = import.meta.env.VITE_URL_BACKEND;
 const CheckoutPage: React.FC = () => {
@@ -90,9 +91,14 @@ const CheckoutPage: React.FC = () => {
   };
 
 const handlePlaceOrder = async () => {
-    if (!user) return alert("Silakan login terlebih dahulu untuk memesan.");
-    if (!selectedAddress || !selectedCourier) return alert("Lengkapi data pengiriman!");
-
+    if (!user){
+      return swalService.error("Gagal membuat pesanan", "Silahkan login terlebih dahulu!");
+    };
+    if (!selectedAddress || !selectedCourier) {
+      return swalService.error("Gagal membuat pesanan", "Silahkan pilih alamat dan kurir terlebih dahulu!");
+    };
+    const isConfirmed = await swalService.confirm("Konfirmasi Pesanan", "Apakah Anda yakin ingin membuat pesanan?");
+    if (!isConfirmed) return;
     setIsLoading(true);
     try {
       const orderData = {
@@ -120,14 +126,14 @@ const handlePlaceOrder = async () => {
 
       if (newOrderId) {
         await fetchCart(); 
-        alert("Pesanan berhasil dibuat!");
+        await swalService.success("Berhasil", "Pesanan berhasil dibuat!");
         navigate(`/order-confirmation/${newOrderId}`);
       } else {
         console.error("Struktur Respon Server:", result);
         throw new Error("Gagal mendapatkan ID pesanan baru dari server.");
       }
       } catch (err: any) {
-      alert("Error: " + err.message);
+        swalService.error("Gagal membuat pesanan", err.message || "Terjadi kesalahan pada server.");
     } finally {
       setIsLoading(false);
     }

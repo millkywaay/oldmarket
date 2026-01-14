@@ -8,6 +8,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import Button from "../components/common/Button";
 import { DEFAULT_CURRENCY } from "../constants";
 import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { swalService } from "../services/swalService";
 
 const baseUrl = import.meta.env.VITE_URL_BACKEND;
 const OrderConfirmationPage: React.FC = () => {
@@ -20,14 +21,20 @@ const OrderConfirmationPage: React.FC = () => {
 
   const handleConfirmReceived = async () => {
     if (!order || !token) return;
-
-    try {
+    const isConfirmed = await swalService.confirm(
+      "Pesanan diterima?",
+      "Pastikan Anda sudah menerima produk dalam kondisi baik."
+    )
+    if (isConfirmed) {
+      try {
       await orderService.markOrderCompleted(token, order.id);
       const updatedOrder = await orderService.getOrderById(token, order.id);
       setOrder(updatedOrder);
+      swalService.success("Pesanan diterima!");
       navigate(`/order-confirmation/${order.id}`);
-    } catch (err) {
-      alert("Gagal mengonfirmasi pesanan diterima.");
+      } catch (err:any) {
+        swalService.error("Gagal konfirmasi!", err.message || "Terjadi kesalahan pada database.");
+      }
     }
   };
 

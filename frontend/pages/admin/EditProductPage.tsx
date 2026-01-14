@@ -5,6 +5,7 @@ import * as productService from "../../services/productService";
 import * as adminService from "../../services/adminService";
 import { useAuth } from "../../contexts/AuthContext";
 import { Brand } from "../../types";
+import { swalService } from "../../services/swalService";
 
 const baseUrl = import.meta.env.VITE_URL_BACKEND;
 export default function EditProductPage() {
@@ -32,12 +33,18 @@ export default function EditProductPage() {
   }, [id]);
   const handleSubmit = async (data: any) => {
     if (!token || !id) return;
+    const confirmUpdate = await swalService.confirm(
+      "Simpan perubahan?",
+      "Data produk akan diperbarui"
+    );
+    if (!confirmUpdate) return;
     setSubmitting(true);
     try {
       await adminService.editProduct(token, id, data);
+      swalService.toast("Produk berhasil diperbarui!", "success");
       navigate("/admin/products");
-    } catch (err) {
-      alert("Gagal mengupdate produk");
+    } catch (err:any) {
+      swalService.error("Gagal diperbarui", err.message || "Terjadi kesalahan pada database.");
     } finally {
       setSubmitting(false);
     }

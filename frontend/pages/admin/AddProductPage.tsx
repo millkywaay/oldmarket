@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import * as productService from "../../services/productService";
 import * as adminService from "../../services/adminService";
 import { useAuth } from "../../contexts/AuthContext";
+import { swalService } from "../../services/swalService";
 
 export default function AddProductPage() {
   const navigate = useNavigate();
@@ -16,15 +17,17 @@ export default function AddProductPage() {
   }, []);
 
   const handleSubmit = async (data: any) => {
-    if (!token) return;
+    if (!token) {
+      swalService.error("Akses Ditolak", "Silakan login kembali.");
+      return;
+    };
     setSubmitting(true);
     try {
       await adminService.addProduct(token, data);
-
-      alert("Produk berhasil disimpan!");
+      await swalService.success("Berhasil!", "Produk baru telah ditambahkan.");
       navigate("/admin/products");
     } catch (err: any) {
-      alert("Error Database: " + err.message);
+      swalService.error("Gagal Simpan", err.message || "Terjadi kesalahan pada database.");
     } finally {
       setSubmitting(false);
     }

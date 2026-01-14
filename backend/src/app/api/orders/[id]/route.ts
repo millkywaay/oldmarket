@@ -97,3 +97,25 @@ export async function GET(
     );
   }
 }
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const orderId = Number(id);
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: "COMPLETED",
+      },
+    });
+    return NextResponse.json({ success: true, data: order }, { status: 200 });
+  } catch (error: any) {
+    console.error("PATCH_ORDER_ERROR:", error);
+    return NextResponse.json(
+      { error: "Gagal memperbarui status pesanan" },
+      { status: 500 }
+    );
+  }
+}

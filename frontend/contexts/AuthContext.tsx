@@ -1,15 +1,10 @@
 import * as React from "react";
-import  {
-  createContext,
-  useState,
-  useEffect,
-  useCallback,
-  ReactNode,
-} from "react";
+import  {createContext, useState, useEffect, useCallback, ReactNode} from "react";
 import api from "../services/api";
 import { User, UserRole } from "../types";
 import * as authService from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import { swalService } from "../services/swalService";
 
 const DEV_AUTH = false;
 interface AuthContextType {
@@ -120,9 +115,10 @@ useEffect(() => {
     try {
       await authService.register(userData);
       navigate("/login");
-      alert("Registration successful! Please login.");
+      await swalService.success("Success", "Registration successful! Please login.");
     } catch (err: any) {
       setError(err.message || "Registration failed");
+      swalService.error("Error", err.message || "Registration failed");
       throw err;
     } finally {
       setIsLoading(false);

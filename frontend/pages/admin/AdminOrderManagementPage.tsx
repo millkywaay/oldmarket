@@ -8,6 +8,7 @@ import Button from '../../components/common/Button';
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { swalService } from '../../services/swalService';
 
 
 interface OrderWithUser extends Order {
@@ -72,23 +73,27 @@ const AdminOrderManagementPage: React.FC = () => {
     fetchOrders();
   }, [fetchOrders]);
 
-const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
-  if (newStatus === OrderStatus.SHIPPED) {
-    setSelectedOrderId(orderId);
-    setIsResiModalOpen(true);
-  } else {
-    try {
-      await adminService.updateOrderStatus(token!, orderId, { status: newStatus });
-      fetchOrders();
-    } catch (err: any) {
-      alert(err.message);
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    if (newStatus === OrderStatus.SHIPPED) {
+      setSelectedOrderId(orderId);
+      setIsResiModalOpen(true);
+    } else {
+      const isConfirmed = await swalService.confirm("Update status?", "Anda yakin ingin mengubah status pesanan ini?");
+      if (isConfirmed) {
+        try {
+          await adminService.updateOrderStatus(token!, orderId, { status: newStatus });
+          swalService.toast("Status berhasil diubah!", "success");
+          fetchOrders();
+        } catch (err: any) {
+          swalService.error("Gagal!", err.message || "Terjadi kesalahan pada database.");
+        }
+      };
     }
-  }
-};
+  };
 
   const submitResi = async () => {
     if (!trackingNumber || !selectedOrderId) {
-      alert("Nomor resi harus diisi!");
+      swalService.error("Gagal!", "Nomor resi wajib diisi!");
       return;
     }
     try {
@@ -99,9 +104,9 @@ const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
       setIsResiModalOpen(false);
       setTrackingNumber('');
       fetchOrders();
-      alert("Pesanan berhasil dikirim dengan nomor resi.");
+      await swalService.success("Berhasil!", "Pesanan telah ditandai sebagai dikirim dengan nomor resi.");
     } catch (err: any) {
-      alert(err.message);
+      swalService.error("Gagal!", err.message || "Terjadi kesalahan pada database.");
     }
   };
 

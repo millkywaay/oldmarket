@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { swalService } from "../services/swalService";
 
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -57,23 +58,23 @@ const ProductDetailPage: React.FC = () => {
     fetchDetail();
   }, [productId]);
 
-const handleBuyNow = async () => {
-  if (!token) {
-    navigate("/login");
-    return;
-  }
+  const handleBuyNow = async () => {
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
-  if (!product) return;
+      if (!product) return;
 
-  navigate("/checkout", {
-    state: {
-      buyNowItem: {
-        product,
-        qty: quantity,
-      },
-    },
-  });
-};
+      navigate("/checkout", {
+        state: {
+          buyNowItem: {
+            product,
+            qty: quantity,
+          },
+        },
+      });
+  };
 
   const nextImage = () => {
     if (product?.images && product.images.length > 0) {
@@ -256,8 +257,12 @@ const handleBuyNow = async () => {
                     className="flex-1 h-12 rounded-sm font-bold"
                     leftIcon={<ShoppingCart size={20} />}
                     onClick={async () => {
-                      await addToCart(product, quantity);
-                      alert("Berhasil masuk keranjang!");
+                      try {
+                        await addToCart(product, quantity);
+                        swalService.toast("Item dimasukkan ke keranjang", "success");
+                      } catch (error) {
+                        swalService.error("Gagal masuk keranjang!");
+                      }
                     }}
                     isLoading={isCartLoading}
                   >

@@ -6,6 +6,7 @@ import FormField from '../common/FormField';
 import * as addressService from '../../services/addressService';
 import * as regionService from '../../services/regionService';
 import { Address } from '../../types';
+import { swalService } from '../../services/swalService';
 
 interface AddressTabProps {
   addresses: Address[];
@@ -106,6 +107,7 @@ const AddressTab: React.FC<AddressTabProps> = ({ addresses, fetchAddresses }) =>
         setDistricts(data);
       } catch (error) {
         setDistricts([]);
+        swalService.error("Gagal", "Tidak dapat memuat data kecamatan.");
       }
     }
   };
@@ -126,6 +128,7 @@ const AddressTab: React.FC<AddressTabProps> = ({ addresses, fetchAddresses }) =>
         setVillages(data);
       } catch (error) {
         setVillages([]);
+        swalService.error("Gagal", "Tidak dapat memuat data desa/kelurahan.");
       }
     }
   };
@@ -137,12 +140,15 @@ const AddressTab: React.FC<AddressTabProps> = ({ addresses, fetchAddresses }) =>
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Hapus alamat ini?")) {
+    const isConfirmed = await swalService.confirm("Hapus Alamat?", "Alamat akan dihapus permanen.");
+    if (isConfirmed) {
       try {
         await addressService.deleteAddress(id);
         fetchAddresses();
+        swalService.success("Berhasil", "Alamat berhasil dihapus.");
       } catch (error) {
-        alert("Gagal menghapus alamat");
+        swalService.error("Gagal", "Tidak dapat menghapus alamat.");
+
       }
     }
   };
@@ -180,7 +186,7 @@ const AddressTab: React.FC<AddressTabProps> = ({ addresses, fetchAddresses }) =>
       setEditingId(addr.id);
       setIsAdding(true);
     } catch (error) {
-      alert("Gagal memuat detail wilayah");
+      swalService.error("Gagal", "Tidak dapat memuat detail wilayah.");
     } finally {
       setIsLoading(false);
     }
@@ -192,7 +198,7 @@ const AddressTab: React.FC<AddressTabProps> = ({ addresses, fetchAddresses }) =>
       await addressService.updateAddress(addr.id, { is_default: true });
       await fetchAddresses();
     } catch (error) {
-      alert("Gagal mengubah alamat utama");
+      swalService.error("Gagal", "Tidak dapat mengubah alamat utama.");
     } finally {
       setIsLoading(false);
     }
@@ -210,7 +216,7 @@ const AddressTab: React.FC<AddressTabProps> = ({ addresses, fetchAddresses }) =>
       await fetchAddresses();
       resetForm();
     } catch (error) {
-      alert("Gagal menyimpan alamat");
+      swalService.error("Gagal", "Tidak dapat menyimpan alamat.");
     } finally {
       setIsLoading(false);
     }

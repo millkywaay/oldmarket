@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { swalService } from "../../services/swalService";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -31,11 +32,17 @@ const AdminSidebar: React.FC<SidebarProps> = ({
     { path: "/admin/reports", icon: <BarChart3 size={20} />, label: "Reports" },
   ];
 
-  const handleLogout = (e: React.MouseEvent) => {
+  const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (window.confirm("Apakah Anda yakin ingin logout?")) {
-      logout();
-      navigate("/");
+    const isConfirmed = await swalService.confirm("Logout", "Anda yakin ingin logout?");
+    if(isConfirmed){
+      try{
+        await logout();
+        swalService.toast("Logout berhasil!", "success");
+        navigate("/login");
+      } catch (err: any) {
+        swalService.error("Gagal!", err.message || "Terjadi kesalahan pada database.");
+      }
     }
   };
 

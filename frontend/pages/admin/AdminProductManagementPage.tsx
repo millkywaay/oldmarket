@@ -10,6 +10,7 @@ import Button from "../../components/common/Button";
 import { DEFAULT_CURRENCY } from "../../constants";
 import { Edit, Trash, Plus } from "lucide-react";
 import { ProductImage } from "@/types/product";
+import { swalService } from "../../services/swalService";
 
 const AdminProductManagementPage: React.FC = () => {
   const { token } = useAuth();
@@ -50,15 +51,25 @@ const AdminProductManagementPage: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleDelete = async (id: string) => {
-    if (!token || !window.confirm("Hapus produk ini?")) return;
+const handleDelete = async (id: string) => {
+  if (!token) {
+    swalService.error('Akses Ditolak', 'Sesi Anda telah habis, silakan login kembali.');
+    return;
+  }
+  const isConfirmed = await swalService.confirm(
+    'Hapus Produk?', 
+    'Produk akan dihapus permanen dari database.'
+  );
+  if (isConfirmed) {
     try {
       await adminService.deleteProduct(token, id);
       setProducts((prev) => prev.filter((p) => p.id !== id));
+      swalService.success('Berhasil!', 'Produk telah berhasil dihapus.');
     } catch (err: any) {
-      alert(err.message || "Gagal menghapus produk");
+      swalService.error('Gagal!', err.message || 'Tidak dapat menghapus produk.');
     }
-  };
+  }
+};
 
   if (isLoading) return <LoadingSpinner message="Memuat data produk..." />;
 

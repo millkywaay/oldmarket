@@ -21,8 +21,6 @@ export default function ProductImageUploader({ images, setImages }: any) {
 
     try {
       const fileName = `${Date.now()}-${file.name}`;
-      
-      // Upload ke bucket
       const { data, error: uploadError } = await supabase.storage
         .from(bucketName)
         .upload(fileName, file);

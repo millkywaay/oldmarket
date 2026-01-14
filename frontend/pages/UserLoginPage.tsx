@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import FormField from "../components/common/FormField";
 import Button from "../components/common/Button";
+import { swalService } from "../services/swalService";
 
 const UserLoginPage: React.FC = () => {
   const [identifier, setIdentifier] = useState("");
@@ -12,31 +13,22 @@ const UserLoginPage: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const DEV_AUTH = false;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (DEV_AUTH) {
-      navigate("/admin/dashboard");
-      return;
-    }
-    setFormError(null);
-
     if (!identifier || !password) {
-      setFormError("Please enter both email and password.");
+      swalService.error("Error", "Please enter both email and password.");
       return;
     }
     try {
       const result = await login({ identifier, password });
+      swalService.toast("Login berhasil!", "success");
       if (result?.user?.role == "ADMIN") {
         navigate("/admin/dashboard");
       } else {
         navigate("/home");
       }
     } catch (err: any) {
-      setFormError(
-        err.message || "Login failed. Please check your credentials."
-      );
+      swalService.error("Error", err.message || "Login failed.");
     }
   };
 

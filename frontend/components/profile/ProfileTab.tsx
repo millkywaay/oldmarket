@@ -3,6 +3,7 @@ import  { useState, useEffect } from "react";
 import FormField from "../common/FormField";
 import Button from "../common/Button";
 import * as userService from "../../services/userService";
+import { swalService } from "../../services/swalService";
 
 interface ProfileTabProps {
   user: any;
@@ -34,10 +35,9 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ user, checkAuth }) => {
       await userService.updateProfile(formData);
       await checkAuth(); 
       setIsEditing(false); 
-      alert("Profil diperbarui!");
-    } catch (error) {
-      console.error("Update failed", error);
-      alert("Gagal memperbarui profil.");
+      swalService.toast("Profil diperbarui!", "success");
+    } catch (error:any) {
+      swalService.error("Gagal memperbarui profil", error.message || "Terjadi kesalahan pada database.");
     } finally {
       setIsLoading(false);
     }
