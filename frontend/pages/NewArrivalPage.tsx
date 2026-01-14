@@ -14,7 +14,6 @@ const NewArrivalPage: React.FC = () => {
       setIsLoading(true);
       try {
         const data = await productService.getAllProducts();
-        // Urutkan berdasarkan tanggal dibuat (created_at) dari database
         const sorted = [...data].sort((a, b) => 
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );

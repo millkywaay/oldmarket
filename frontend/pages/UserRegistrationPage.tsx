@@ -75,7 +75,7 @@ const UserRegistrationPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                placeholder="Create a password (min. 8 characters)"
+                placeholder="Create a password"
               />
               <FormField
                 label="Confirm Password"

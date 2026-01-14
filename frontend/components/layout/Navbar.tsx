@@ -3,17 +3,73 @@ import   { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCart } from "../../contexts/CartContext";
-import {
-  Search,
-  ShoppingCart,
-  User,
-  Menu,
-  X,
-  LogOut,
-  LayoutDashboard,
-} from "lucide-react";
+import { Search,  ShoppingCart, User, Menu, X, LogOut, LayoutDashboard} from "lucide-react";
 import { Product } from "../../types";
 import * as productService from "../../services/productService";
+import { set } from "date-fns";
+import { swalService } from "@/services/swalService";
+
+interface SearchProps {
+  searchQuery: string;
+  handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSearchSubmit: (e: React.FormEvent) => void;
+  handleBlur: () => void;
+  suggestions: Product[];
+  isSuggestionsVisible: boolean;
+  handleSuggestionClick: (name: string) => void; // Perbaikan typo nama di sini
+}
+
+const SearchFormComponent: React.FC<SearchProps> = ({
+  searchQuery,
+  handleSearchChange,
+  handleSearchSubmit,
+  handleBlur,
+  suggestions,
+  isSuggestionsVisible,
+  handleSuggestionClick 
+}) => (
+  <div className="relative w-full">
+    <form onSubmit={handleSearchSubmit}>
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Search for products..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onBlur={handleBlur}
+          className="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+        />
+        <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <Search className="w-5 h-5" />
+        </button>
+      </div>
+    </form>
+    
+    {isSuggestionsVisible && suggestions.length > 0 && (
+      <ul className="absolute top-full mt-2 w-full bg-white rounded-md shadow-lg z-50 overflow-hidden border">
+        {suggestions.map((product) => (
+          <li key={product.id}>
+            <button
+              onClick={() => handleSuggestionClick(product.name)}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-3"
+            >
+              <img src={product.image_url} alt={product.name} className="w-8 h-10 object-cover rounded flex-shrink-0" />
+              <span className="text-sm truncate">{product.name}</span>
+            </button>
+          </li>
+        ))}
+        <li>
+          <button
+            onClick={(e) => handleSearchSubmit(e)}
+            className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 font-semibold text-sm text-center"
+          >
+            Search for "{searchQuery}"
+          </button>
+        </li>
+      </ul>
+    )}
+  </div>
+);
 
 const Navbar: React.FC = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -28,42 +84,39 @@ const Navbar: React.FC = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-  productService
-    .getAllProducts({ limit: 20 })
-    .then((response) => {
-      if (response && response.items) {
-        setAllProducts(response.items as unknown as Product[]);
-      }
-    })
-    .catch((err) => {
-      console.error("Failed to load products for search:", err);
-    });
-}, []);
-  useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
     setIsSuggestionsVisible(false);
   }, [location.pathname]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleSearchChange = React.useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
-    setSearchQuery(query);
+    setSearchQuery(query); 
 
     if (query.length > 1) {
-      const filteredSuggestions = allProducts
-        .filter(
-          (product) =>
-            product.name.toLowerCase().includes(query.toLowerCase()) ||
-            product.brand?.name.toLowerCase().includes(query.toLowerCase())
-        )
-        .slice(0, 5);
-      setSuggestions(filteredSuggestions);
-      setIsSuggestionsVisible(true);
+      try {
+        const data = await productService.getSearchProducts({ q: query, limit: 5 });
+        const sortedData = data.sort((a, b)=>{
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase();
+          const search = query.toLowerCase();
+
+          const startsWithA = nameA.startsWith(search);
+          const startsWithB = nameB.startsWith(search);
+          if (startsWithA && !startsWithB) return -1;
+          if (!startsWithA && startsWithB) return 1;
+          return nameA.localeCompare(nameB);
+        });
+        setSuggestions(sortedData.slice(0, 5));
+        setIsSuggestionsVisible(true);
+      } catch (err) {
+        console.error("Search suggestions error:", err);
+      }
     } else {
       setSuggestions([]);
       setIsSuggestionsVisible(false);
     }
-  };
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,67 +145,25 @@ const Navbar: React.FC = () => {
   const handleBlur = () => {
     setTimeout(() => {
       setIsSuggestionsVisible(false);
-    }, 150); // Delay to allow click on suggestions
+    }, 150); 
   };
 
-  const navLinkClass =
-    "text-gray-700 hover:text-black transition-colors text-sm font-medium";
+  const searchProps = {
+    searchQuery,
+    handleSearchChange,
+    handleSearchSubmit,
+    handleBlur,
+    suggestions,
+    isSuggestionsVisible,
+    handleSuggestionClick
+  };
+  const navLinkClass = (path: string) => {
+    const isActive = location.pathname === path;
+    const baseClass = "transition-colors text-sm font-medium";
+    return `${baseClass} ${isActive ? "text-black font-bold" : "text-gray-700 hover:text-black"}`;
+  };
   const hideCartOnPaths = ["/", "/login", "/register", "/admin/login"];
   const shouldShowCart = !hideCartOnPaths.includes(location.pathname);
-
-  const SearchFormComponent = () => (
-    <div className="relative w-full">
-      <form onSubmit={handleSearchSubmit}>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search for products..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onFocus={() => {
-              if (suggestions.length > 0) setIsSuggestionsVisible(true);
-            }}
-            onBlur={handleBlur}
-            className="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-          />
-          <button
-            type="submit"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            aria-label="Search"
-          >
-            <Search className="w-5 h-5" />
-          </button>
-        </div>
-      </form>
-      {isSuggestionsVisible && suggestions.length > 0 && (
-        <ul className="absolute top-full mt-2 w-full bg-white rounded-md shadow-lg z-50 overflow-hidden border">
-          {suggestions.map((product) => (
-            <li key={product.id}>
-              <button
-                onClick={() => handleSuggestionClick(product.name)}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-3"
-              >
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-8 h-10 object-cover rounded flex-shrink-0"
-                />
-                <span className="text-sm truncate">{product.name}</span>
-              </button>
-            </li>
-          ))}
-          <li>
-            <button
-              onClick={(e) => handleSearchSubmit(e)}
-              className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 font-semibold text-sm text-center"
-            >
-              Search for "{searchQuery}"
-            </button>
-          </li>
-        </ul>
-      )}
-    </div>
-  );
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-40">
@@ -169,20 +180,20 @@ const Navbar: React.FC = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center space-x-8">
-            <Link to="/home" className={navLinkClass}>
+            <Link to="/home" className={navLinkClass("/home")}>
               Home
             </Link>
-            <Link to="/products" className={navLinkClass}>
+            <Link to="/products" className={navLinkClass("/products")}>
               All Products
             </Link>
-            <Link to="/new-arrival" className={navLinkClass}>
+            <Link to="/new-arrival" className={navLinkClass("/new-arrival")}>
               New Arrival
             </Link>
-            <Link to="/top-selling" className={navLinkClass}>
+            <Link to="/top-selling" className={navLinkClass("/top-selling")}>
               Top Selling
             </Link>
             {user && !isAdmin && (
-              <Link to="/recommendations" className={navLinkClass}>
+              <Link to="/recommendations" className={navLinkClass("/recommendations")}>
                 For You
               </Link>
             )}
@@ -190,7 +201,7 @@ const Navbar: React.FC = () => {
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 mx-8 max-w-md">
-            <SearchFormComponent />
+            <SearchFormComponent {...searchProps} />
           </div>
 
           {/* Right Icons & Mobile Menu Button */}
@@ -300,7 +311,7 @@ const Navbar: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200">
             <div className="px-4 pt-4 pb-6 space-y-4">
-              <SearchFormComponent />
+              <SearchFormComponent {...searchProps} />
 
               <div className="flex flex-col space-y-2">
                 <Link
