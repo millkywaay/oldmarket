@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const range = searchParams.get('range') || 'month';
 
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
 
     if (range === 'day') startDate.setHours(0, 0, 0, 0);
     else if (range === 'week') startDate.setDate(now.getDate() - 7);
@@ -20,11 +20,16 @@ export async function GET(request: Request) {
       },
       include: { items: true }
     });
-    const totalRevenue = ordersInRange.reduce((sum, o) => sum + Number(o.grand_total), 0);
+    const totalRevenue = ordersInRange.reduce((sum, order) => {
+      const orderItemsSum = order.items.reduce((itemSum, item) => {
+        return itemSum + Number(item.line_total); 
+      }, 0);
+      return sum + orderItemsSum;
+    }, 0);
     const totalOrders = ordersInRange.length;
     const totalProducts = await prisma.product.count();
     const lowStockCount = await prisma.product.count({
-      where: { stock_quantity: { lt: 5 } } // Alert stok < 5
+      where: { stock_quantity: { lt: 0 } } 
     });
     const salesMap = new Map();
     ordersInRange.forEach(o => {
@@ -67,6 +72,7 @@ export async function GET(request: Request) {
       }))
     });
   } catch (error) {
+    console.error("GET_DASHBOARD_ERROR:", error);
     return NextResponse.json({ error: "Gagal memuat dashboard" }, { status: 500 });
   }
 }
