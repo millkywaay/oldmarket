@@ -160,6 +160,10 @@ const OrderConfirmationPage: React.FC = () => {
                 <span className="text-gray-600">Status Pesanan:</span>{" "}
                 <strong className="capitalize">{order.order_status}</strong>
               </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Resi:</span>{" "}
+                <strong className="capitalize">{order.tracking_number || "-"}</strong>
+              </div>
               <div className="flex justify-between text-lg border-t pt-3 mt-3">
                 <span className="font-semibold">Total Pembayaran:</span>{" "}
                 <strong className="font-bold">

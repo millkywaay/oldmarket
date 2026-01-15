@@ -65,9 +65,8 @@ export async function GET(
       id: order.id,
       created_at: order.created_at,
       total_amount: Number(order.grand_total),
-
       shipping_address: `${order.street}, ${order.city}, ${order.province} ${order.postal_code}`,
-
+      tracking_number: order.tracking_number,
       payment_method: order.payment_link
         ? "Pembayaran Online"
         : "Manual Transfer",

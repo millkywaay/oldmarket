@@ -123,6 +123,7 @@ export interface Order {
   transaction_currency: 'Rp';
   created_at: string;
   updated_at?: string;
+  tracking_number?: string;
   items: OrderItem[];
 }
 
