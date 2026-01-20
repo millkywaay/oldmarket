@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     const totalOrders = ordersInRange.length;
     const totalProducts = await prisma.product.count();
     const lowStockCount = await prisma.product.count({
-      where: { stock_quantity: { lt: 0 } } 
+      where: { stock_quantity: { lte: 0 } } 
     });
     const salesMap = new Map();
     ordersInRange.forEach(o => {

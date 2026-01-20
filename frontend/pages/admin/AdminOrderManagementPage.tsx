@@ -210,15 +210,6 @@ const AdminOrderManagementPage: React.FC = () => {
       </div>
       )}
 
-      {/* Pagination */}
-      <div className="mt-6 flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
-        <p className="text-sm text-gray-600">Total: {ordersResponse?.total || 0} Orders</p>
-        <div className="flex gap-2">
-          <Button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} variant="outline">Prev</Button>
-          <span className="px-4 py-2 bg-gray-100 rounded text-sm font-bold">{currentPage}</span>
-          <Button onClick={() => setCurrentPage(p => p + 1)} disabled={!ordersResponse?.items.length || ordersResponse.items.length < ordersPerPage} variant="outline">Next</Button>
-        </div>
-      </div>
 
       {/* Modal Input Resi */}
       {isResiModalOpen && (
