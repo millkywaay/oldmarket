@@ -51,6 +51,12 @@ const AdminSalesReportsPage: React.FC = () => {
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.text("OLDMARKETJKT - SALES REPORT", 14, 15);
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    const periode = (dateFrom || dateTo) 
+      ? `Periode: ${dateFrom || '...'} s/d ${dateTo || '...'}`
+      : "Periode: Semua Waktu";
+    doc.text(periode, 14, 22);
     autoTable(doc, {
       startY: 25,
       head: [['No', 'Nama Product', 'Unit Price', 'Unit Sold', 'Sub Total']],
@@ -63,7 +69,11 @@ const AdminSalesReportsPage: React.FC = () => {
       ]),
       foot: [['', 'TOTAL', '', totalQty, `Rp ${totalRevenue.toLocaleString('id-ID')}`]],
       theme: 'grid',
+      headStyles: { fillColor: [31, 41, 55] }
     });
+    const today = new Date().toLocaleDateString('id-ID');
+    doc.setFontSize(10);
+    doc.text(`Dicetak pada: ${today}`, 14, (doc as any).lastAutoTable.finalY + 10);
     doc.save(`Sales_Report.pdf`);
   };
 
